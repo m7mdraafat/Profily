@@ -1,10 +1,4 @@
-import './App.css'
-import {
-  Routes,
-  Route,
-  NavLink,
-  Outlet
-} from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { PortfolioBuilderPage } from './pages/PortfolioBuilderPage'
 import { TemplatesPage } from './pages/TemplatesPage'
@@ -26,27 +20,4 @@ function App() {
   )
 }
 
-function Layout() {
-  return (
-    <>
-    <GlowBackground />
-    <div style={{position: 'relative', zIndex: 1}}>
-
-      <header>
-        <h1>Profily</h1>
-        <nav>
-          <NavLink to="/" end>Home</NavLink> {" "}
-          <NavLink to="/portfolio">Portfolio Builder</NavLink>{ " " }
-          <NavLink to="/templates">Templates</NavLink> {" "}
-          <NavLink to="/profile">Profile Builder</NavLink>
-        </nav>
-      </header>
-
-      <main>
-        <Outlet />
-      </main>
-    </div>
-    </>
-  )
-}
 export default App

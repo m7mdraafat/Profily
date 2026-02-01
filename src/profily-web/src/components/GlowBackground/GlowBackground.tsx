@@ -1,10 +1,10 @@
-import styles from './GlowBackground.module.css';
+import { styles } from './GlowBackground.styles';
 
 export function GlowBackground() {
   return (
-    <div className={styles.container}>
-      <div className={`${styles.blob} ${styles.blobBlue}`} />
-      <div className={`${styles.blob} ${styles.blobPurple}`} />
+    <div className={styles.wrapper}>
+      <div className={styles.blueGlow} />
+      <div className={styles.purpleGlow} />
     </div>
   );
 }

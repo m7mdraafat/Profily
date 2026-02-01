@@ -1,42 +1,124 @@
-import { useState, useEffect } from 'react'
-import { getHealth } from '../services/apiClient';
+import { useNavigate } from 'react-router-dom';
+import { 
+  UserCircle, 
+  Briefcase, 
+  Sparkles, 
+  BarChart3, 
+  Rocket, 
+  RefreshCw, 
+  Smartphone, 
+  Search,
+  ArrowRight,
+  ChevronRight,
+  Github
+} from 'lucide-react';
+import { Badge } from '../components';
+import { styles } from './HomePage.styles';
 
 export function HomePage() {
-    const [status, setStatus] = useState<string>('loading');
-    const [data, setData] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-    async function checkHealth() : Promise<void> {
-        setStatus('loading');
-        setError(null);
+  return (
+    <div className={styles.wrapper}>
+      {/* Hero Section */}
+      <section className={styles.hero.section}>
+        <span className={styles.hero.badge}>
+          Build Your Developer Identity
+        </span>
+        <h1 className={styles.hero.title}>
+          Create stunning <span className={styles.hero.gradient}>GitHub profiles</span> and <span className={styles.hero.gradient}>portfolios</span>
+        </h1>
+        <p className={styles.hero.subtitle}>
+          Transform your GitHub presence in minutes. No coding required.
+        </p>
+      </section>
 
-        try {
-            const result =  await getHealth();
+      {/* Workflow Section */}
+      <section>
+        <h2 className={styles.workflow.title}>How It Works</h2>
+        <p className={styles.workflow.subtitle}>Three simple steps</p>
 
-            setStatus("Ok");
-            setData(JSON.stringify(result, null, 2));
-        } catch (err: unknown) {
-            setStatus('Error');
-            setError(err instanceof Error ? err.message : String(err));
-        }
-    }
+        <div className={styles.workflow.container}>
+          {/* Step 1 - Connect */}
+          <div className={styles.workflow.stepWrapper}>
+            <div className={styles.card.base}>
+              <div className={`${styles.iconBox.base} ${styles.iconBox.github}`}>
+                <Github size={22} />
+              </div>
+              <div>
+                <h3 className={styles.stepText.title}>Connect GitHub</h3>
+                <p className={styles.stepText.description}>Sign in to import your repos and stats.</p>
+              </div>
+            </div>
+          </div>
 
-    useEffect(() => {
-        checkHealth();
-    }, []);
+          {/* Arrow 1 */}
+          <div className={styles.workflow.arrow}>
+            <ChevronRight size={20} className={styles.workflow.arrowIcon} />
+          </div>
 
-    return (
-        <>
-            <h1>Home Page</h1>
-            {status === "loading" ? (
-                <p>Loading...</p>
-            ) : status === "Ok" ? (
-                <pre>{data}</pre>
-            ) : (
-                <p style={{color: "red"}}>Error: {error}</p>
-            )}
+          {/* Step 2 - Choose */}
+          <div className={styles.workflow.stepWrapper}>
+            <div className={styles.card.choose}>
+              <span className={styles.card.chooseLabel}>Choose what to build</span>
+              <div className={styles.card.chooseButtons}>
+                <button
+                  onClick={() => navigate('/profile')}
+                  className={`${styles.stepButton.base} ${styles.stepButton.profile}`}
+                >
+                  <div className={styles.iconBox.profile}>
+                    <UserCircle size={18} />
+                  </div>
+                  <span className={styles.stepButton.text}>Profile README</span>
+                  <ArrowRight size={14} className={styles.stepButton.arrow} />
+                </button>
+                <span className={styles.card.or}>or</span>
+                <button
+                  onClick={() => navigate('/portfolio')}
+                  className={`${styles.stepButton.base} ${styles.stepButton.portfolio}`}
+                >
+                  <div className={styles.iconBox.portfolio}>
+                    <Briefcase size={18} />
+                  </div>
+                  <span className={styles.stepButton.text}>Portfolio Website</span>
+                  <ArrowRight size={14} className={styles.stepButton.arrow} />
+                </button>
+              </div>
+            </div>
+          </div>
 
-            <button onClick={checkHealth}>Refresh</button>
-        </>
-    )
+          {/* Arrow 2 */}
+          <div className={styles.workflow.arrow}>
+            <ChevronRight size={20} className={styles.workflow.arrowIcon} />
+          </div>
+
+          {/* Step 3 - Deploy */}
+          <div className={styles.workflow.stepWrapper}>
+            <div className={styles.card.base}>
+              <div className={`${styles.iconBox.base} ${styles.iconBox.rocket}`}>
+                <Rocket size={22} />
+              </div>
+              <div>
+                <h3 className={styles.stepText.title}>Deploy & Share</h3>
+                <p className={styles.stepText.description}>One-click deploy to GitHub Pages.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className={styles.features.section}>
+        <h3 className={styles.features.title}>Platform Features</h3>
+        <div className={styles.features.badges}>
+          <Badge icon={<Sparkles size={14} />}>Multiple Themes</Badge>
+          <Badge icon={<BarChart3 size={14} />}>Dynamic Stats</Badge>
+          <Badge icon={<Rocket size={14} />}>GitHub Pages Deploy</Badge>
+          <Badge icon={<RefreshCw size={14} />}>Auto-Updates</Badge>
+          <Badge icon={<Smartphone size={14} />}>Mobile Responsive</Badge>
+          <Badge icon={<Search size={14} />}>SEO Optimized</Badge>
+        </div>
+      </section>
+    </div>
+  );
 }

@@ -1,8 +1,8 @@
-import styles from './Button.module.css';
+import { getButtonClass } from './Button.styles';
 
 export interface ButtonProps {
     variant: 'primary' | 'secondary';
-    onClick: () => void;
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
     disabled?: boolean;
     children: React.ReactNode;
 }
@@ -12,7 +12,7 @@ export function Button({ variant, onClick, disabled, children }: ButtonProps) {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${styles.button} ${styles[variant]}`}
+      className={getButtonClass(variant)}
     >
       {children}
     </button>

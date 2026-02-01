@@ -1,4 +1,4 @@
-import styles from './Input.module.css';
+import { styles } from './Input.styles';
 
 export interface InputProps {
     value: string;
