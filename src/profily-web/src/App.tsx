@@ -4,7 +4,7 @@ import { PortfolioBuilderPage } from './pages/PortfolioBuilderPage'
 import { TemplatesPage } from './pages/TemplatesPage'
 import { ProfileBuilderPage } from './pages/ProfileBuilderPage'
 import { NotFoundPage } from './pages/NotFoundPage'
-import { Layout } from './components';
+import { GlowBackground } from './components/index';
 
 function App() {
   return (
