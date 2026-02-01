@@ -19,6 +19,14 @@ export const styles = {
     },
     mobileToggle: 'md:hidden p-2.5 text-white hover:bg-white/10 rounded-lg transition-colors',
     desktopNav: 'hidden md:flex gap-1 ml-auto',
+    auth: {
+      wrapper: 'hidden md:flex items-center ml-4 pl-4 border-l border-white/10',
+      login: 'flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-slate-800 border border-white/20 rounded-lg hover:bg-slate-700 hover:border-white/30 transition-all duration-200',
+    },
+    mobileAuth: {
+      wrapper: 'flex flex-col gap-2 mt-3 pt-3 border-t border-white/10',
+      login: 'flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-slate-800 border border-white/20 rounded-lg',
+    },
   },
 
   // Mobile menu
