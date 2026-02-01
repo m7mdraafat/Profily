@@ -7,10 +7,11 @@ export const styles = {
   // Hero Section
   hero: {
     section: 'text-center pt-6 sm:pt-12 pb-2 sm:pb-4 animate-[fadeInUp_0.8s_ease-out]',
-    badge: 'inline-block px-3 sm:px-4 py-1.5 mb-4 sm:mb-6 text-xs sm:text-sm font-medium text-blue-400 bg-blue-600/10 border border-blue-600/30 rounded-full',
+    badge: 'inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 mb-4 sm:mb-6 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 border border-white/20 rounded-full shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 hover:border-white/30 transition-all duration-300',
+    badgeIcon: 'text-amber-400 animate-[spin_4s_linear_infinite]',
     title: 'text-2xl sm:text-3xl md:text-5xl font-extrabold text-white mb-3 sm:mb-4 leading-tight px-2',
     gradient: 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent',
-    subtitle: 'text-base sm:text-lg text-slate-400 max-w-xl mx-auto px-4',
+    subtitle: 'text-sm sm:text-base text-slate-400 max-w-xl mx-auto px-4 mb-6 sm:mb-8',
   },
 
   // Workflow Section
@@ -25,7 +26,7 @@ export const styles = {
 
   // Cards
   card: {
-    base: 'p-4 sm:p-6 flex flex-col items-center text-center gap-3 sm:gap-4 bg-slate-800/50 border border-white/10 rounded-xl hover:-translate-y-1 transition-transform',
+    base: 'p-4 sm:p-6 flex flex-col items-center text-center gap-3 sm:gap-4 bg-slate-800/50 border border-white/10 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-lg hover:shadow-blue-500/10',
     choose: 'p-3 sm:p-4 flex flex-col items-center gap-2 sm:gap-3 bg-slate-800/30 border border-white/5 rounded-xl',
     chooseLabel: 'text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider',
     chooseButtons: 'flex flex-col gap-2 w-full',
@@ -62,4 +63,7 @@ export const styles = {
     title: 'text-base sm:text-lg font-semibold text-slate-300 mb-3 sm:mb-4',
     badges: 'flex flex-wrap justify-center gap-1.5 sm:gap-2 px-2',
   },
+
+  // Section Divider
+  divider: 'w-full max-w-md mx-auto h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent my-6 sm:my-8',
 } as const;

@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { 
-  UserCircle, 
-  Briefcase, 
-  Sparkles, 
+  FileCode2, 
+  LayoutDashboard, 
+  Palette, 
   BarChart3, 
   Rocket, 
   RefreshCw, 
@@ -22,9 +22,6 @@ export function HomePage() {
     <div className={styles.wrapper}>
       {/* Hero Section */}
       <section className={styles.hero.section}>
-        <span className={styles.hero.badge}>
-          Build Your Developer Identity
-        </span>
         <h1 className={styles.hero.title}>
           Create stunning <span className={styles.hero.gradient}>GitHub profiles</span> and <span className={styles.hero.gradient}>portfolios</span>
         </h1>
@@ -32,6 +29,9 @@ export function HomePage() {
           Transform your GitHub presence in minutes. No coding required.
         </p>
       </section>
+
+      {/* Gradient Divider */}
+      <div className={styles.divider} />
 
       {/* Workflow Section */}
       <section>
@@ -67,7 +67,7 @@ export function HomePage() {
                   className={`${styles.stepButton.base} ${styles.stepButton.profile}`}
                 >
                   <div className={styles.iconBox.profile}>
-                    <UserCircle size={18} />
+                    <FileCode2 size={18} />
                   </div>
                   <span className={styles.stepButton.text}>Profile README</span>
                   <ArrowRight size={14} className={styles.stepButton.arrow} />
@@ -78,7 +78,7 @@ export function HomePage() {
                   className={`${styles.stepButton.base} ${styles.stepButton.portfolio}`}
                 >
                   <div className={styles.iconBox.portfolio}>
-                    <Briefcase size={18} />
+                    <LayoutDashboard size={18} />
                   </div>
                   <span className={styles.stepButton.text}>Portfolio Website</span>
                   <ArrowRight size={14} className={styles.stepButton.arrow} />
@@ -107,16 +107,19 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* Gradient Divider */}
+      <div className={styles.divider} />
+
       {/* Features */}
       <section className={styles.features.section}>
         <h3 className={styles.features.title}>Platform Features</h3>
         <div className={styles.features.badges}>
-          <Badge icon={<Sparkles size={14} />}>Multiple Themes</Badge>
-          <Badge icon={<BarChart3 size={14} />}>Dynamic Stats</Badge>
-          <Badge icon={<Rocket size={14} />}>GitHub Pages Deploy</Badge>
-          <Badge icon={<RefreshCw size={14} />}>Auto-Updates</Badge>
-          <Badge icon={<Smartphone size={14} />}>Mobile Responsive</Badge>
-          <Badge icon={<Search size={14} />}>SEO Optimized</Badge>
+          <Badge icon={<Palette size={14} className="text-pink-400" />}>Multiple Themes</Badge>
+          <Badge icon={<BarChart3 size={14} className="text-emerald-400" />}>Dynamic Stats</Badge>
+          <Badge icon={<Rocket size={14} className="text-orange-400" />}>GitHub Pages Deploy</Badge>
+          <Badge icon={<RefreshCw size={14} className="text-cyan-400" />}>Auto-Updates</Badge>
+          <Badge icon={<Smartphone size={14} className="text-purple-400" />}>Mobile Responsive</Badge>
+          <Badge icon={<Search size={14} className="text-yellow-400" />}>SEO Optimized</Badge>
         </div>
       </section>
     </div>

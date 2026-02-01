@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { GlowBackground } from '../GlowBackground/GlowBackground';
-import { Menu, X, Sparkles, Github, Heart } from 'lucide-react';
+import { Menu, X, Sparkles, Github, Heart, Twitter, Linkedin } from 'lucide-react';
 import { styles, getNavLinkClass, getMobileNavClass } from './Layout.styles';
 
 export function Layout() {
@@ -55,9 +55,17 @@ export function Layout() {
           <nav className={styles.header.desktopNav}>
             <NavLink to="/" end className={getNavLinkClass}>Home</NavLink>
             <NavLink to="/portfolio" className={getNavLinkClass}>Portfolio Builder</NavLink>
-            <NavLink to="/templates" className={getNavLinkClass}>Templates</NavLink>
             <NavLink to="/profile" className={getNavLinkClass}>Profile Builder</NavLink>
+            <NavLink to="/templates" className={getNavLinkClass}>Templates</NavLink>
           </nav>
+
+          {/* Auth Button */}
+          <div className={styles.header.auth.wrapper}>
+            <button className={styles.header.auth.login}>
+              <Github size={16} />
+              Sign In
+            </button>
+          </div>
         </header>
 
         {/* Mobile Menu Overlay */}
@@ -71,6 +79,14 @@ export function Layout() {
           <NavLink to="/portfolio" className={getNavLinkClass} onClick={closeMenu}>Portfolio Builder</NavLink>
           <NavLink to="/templates" className={getNavLinkClass} onClick={closeMenu}>Templates</NavLink>
           <NavLink to="/profile" className={getNavLinkClass} onClick={closeMenu}>Profile Builder</NavLink>
+          
+          {/* Mobile Auth */}
+          <div className={styles.header.mobileAuth.wrapper}>
+            <button className={styles.header.mobileAuth.login} onClick={closeMenu}>
+              <Github size={16} />
+              Sign In
+            </button>
+          </div>
         </nav>
 
         {/* Main Content */}
@@ -121,8 +137,14 @@ export function Layout() {
               <div>
                 <h4 className={styles.footer.section.title}>Connect</h4>
                 <div className={styles.footer.social.wrapper}>
-                  <a href="https://github.com" target="_blank" rel="noopener noreferrer" className={styles.footer.social.icon}>
+                  <a href="https://github.com/m7mdraafat/Profily" target="_blank" rel="noopener noreferrer" className={styles.footer.social.icon} aria-label="GitHub">
                     <Github size={18} />
+                  </a>
+                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className={styles.footer.social.icon} aria-label="Twitter">
+                    <Twitter size={18} />
+                  </a>
+                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className={styles.footer.social.icon} aria-label="LinkedIn">
+                    <Linkedin size={18} />
                   </a>
                 </div>
               </div>
