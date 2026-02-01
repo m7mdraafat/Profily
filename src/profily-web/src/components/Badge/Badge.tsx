@@ -1,4 +1,4 @@
-import styles from './Badge.module.css';
+import { styles } from './Badge.styles';
 
 export interface BadgeProps {
     children: React.ReactNode;
