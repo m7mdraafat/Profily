@@ -33,4 +33,6 @@ The frontend dev server proxies `/api/*` to `http://localhost:5229`.
 
 ## Docs
 
-See [docs/project_idea.md](docs/project_idea.md) for the product vision.
+Start here: [docs/README.md](docs/README.md)
+
+The original brainstorm is in [docs/project_idea.md](docs/project_idea.md).
