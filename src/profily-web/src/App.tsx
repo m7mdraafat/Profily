@@ -10,6 +10,7 @@ import { PortfolioBuilderPage } from './pages/PortfolioBuilderPage'
 import { TemplatesPage } from './pages/TemplatesPage'
 import { ProfileBuilderPage } from './pages/ProfileBuilderPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { GlowBackground } from './components/index';
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
 function Layout() {
   return (
     <>
+    <GlowBackground />
+    <div style={{position: 'relative', zIndex: 1}}>
+
       <header>
         <h1>Profily</h1>
         <nav>
@@ -41,6 +45,7 @@ function Layout() {
       <main>
         <Outlet />
       </main>
+    </div>
     </>
   )
 }
