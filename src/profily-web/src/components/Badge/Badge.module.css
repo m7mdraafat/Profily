@@ -1,0 +1,20 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  backdrop-filter: var(--blur-glass);
+  box-shadow: var(--shadow-card);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-accent-blue-light);
+}
