@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Profily.Core.Interfaces;
 using Profily.Core.Options;
 using Profily.Infrastructure.Data;
+using Profily.Infrastructure.Services;
 
 namespace Profily.Infrastructure.Extensions;
 
@@ -15,7 +16,10 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddCosmosDb(configuration);
-
+        services.AddGitHubAuthentication(configuration);
+        services.AddProfilyCors(configuration);
+        services.AddServices();
+        
         return services;
     }
     /// <summary>
@@ -50,6 +54,14 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddSingleton<ICosmosDbService, CosmosDbService>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddServices(
+        this IServiceCollection services)
+    {
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }
