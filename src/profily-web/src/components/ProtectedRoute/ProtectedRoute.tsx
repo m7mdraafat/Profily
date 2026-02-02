@@ -1,12 +1,26 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useEffect, useRef } from 'react';
+import { useAuth, useToast, TOAST_TYPE } from '../../contexts';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, login } = useAuth();
+  const { showToast } = useToast();
+  const hasShownToast = useRef(false);
+
+  useEffect(() => {
+    // Show toast only once when redirecting unauthenticated user
+    if (!isLoading && !isAuthenticated && !hasShownToast.current) {
+      hasShownToast.current = true;
+      showToast(TOAST_TYPE.WARNING, 'Please sign in to access this feature', {
+        label: 'Sign In',
+        onClick: login,
+      });
+    }
+  }, [isLoading, isAuthenticated, showToast, login]);
 
   if (isLoading) {
     return (
