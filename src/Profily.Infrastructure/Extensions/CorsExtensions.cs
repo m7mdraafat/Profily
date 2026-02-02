@@ -27,7 +27,7 @@ public static class CorsExtensions
                 else
                 {
                     // Development fallback
-                    policy.WithOrigins("https://localhost:5183", "https://localhost:5183");
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173");
                 }
 
                 policy.AllowCredentials() // Required for cookies

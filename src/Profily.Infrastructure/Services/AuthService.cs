@@ -28,6 +28,7 @@ public class AuthService : IAuthService
             ?? throw new InvalidOperationException("GitHub username claim not found.");
         var email = principal.FindFirst(ClaimTypes.Email)?.Value;
         var avatarUrl = principal.FindFirst("urn:github:avatar")?.Value;
+        var name = principal.FindFirst("urn:github:name")?.Value;
 
         // Check if user exists
         var existingUser = await _cosmosDbService.GetUserByGitHubIdAsync(githubId);
@@ -38,6 +39,7 @@ public class AuthService : IAuthService
 
             // Update user info 
             existingUser.GitHubUsername = username;
+            existingUser.Name = name;
             existingUser.Email = email;
             existingUser.AvatarUrl = avatarUrl;
             existingUser.AccessToken = accessToken;
@@ -51,6 +53,7 @@ public class AuthService : IAuthService
             Id = Guid.NewGuid().ToString(),
             GitHubId = githubId,
             GitHubUsername = username,
+            Name = name,
             Email = email,
             AvatarUrl = avatarUrl,
             AccessToken = accessToken,
