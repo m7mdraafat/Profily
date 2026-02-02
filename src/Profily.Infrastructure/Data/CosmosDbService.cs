@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Profily.Core.Interfaces;
 using Profily.Core.Options;
-using Profily.Core.Models;
 using User = Profily.Core.Models.User;
 using Microsoft.Azure.Cosmos.Linq;
 
