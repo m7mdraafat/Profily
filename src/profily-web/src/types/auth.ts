@@ -4,6 +4,7 @@
 export interface User {
     id: string;
     gitHubUsername: string;
+    name: string | null;
     email: string | null;
     avatarUrl: string | null;
     createdAt: string;

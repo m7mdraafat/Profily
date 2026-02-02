@@ -125,7 +125,7 @@ public static class AuthEndpoints
             });
         
         // Redirect to the original return URL or home
-        var frontendBaseUrl = "http://localhost:5183";
+        var frontendBaseUrl = "http://localhost:5173";
         var validReturnUrl = ValidateReturnUrl(returnUrl);
         
         // Convert relative URLs to absolute frontend URLs
@@ -218,8 +218,8 @@ public static class AuthEndpoints
         // Allow known safe origins (frontend URLs)
         var safeOrigins = new[]
         {
-            "http://localhost:5183",
-            "https://localhost:5183",
+            "http://localhost:5173",
+            "https://localhost:5173",
             // Add production frontend URL here
         };
 

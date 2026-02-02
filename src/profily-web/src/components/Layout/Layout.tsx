@@ -106,7 +106,7 @@ export function Layout() {
                   <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-white/10 rounded-lg shadow-xl py-1 z-50">
                     <div className="px-4 py-2 border-b border-white/10">
                       <p className="text-sm font-medium text-white truncate">
-                        {user.gitHubUsername}
+                        {user.name || user.gitHubUsername}
                       </p>
                       {user.email && (
                         <p className="text-xs text-slate-400 truncate">{user.email}</p>
@@ -157,7 +157,7 @@ export function Layout() {
                     alt={user.gitHubUsername}
                     className="w-8 h-8 rounded-full border border-white/20"
                   />
-                  <span className="text-sm font-medium text-white">{user.gitHubUsername}</span>
+                  <span className="text-sm font-medium text-white">{user.name || user.gitHubUsername}</span>
                 </div>
                 <button
                   onClick={async () => {closeMenu(); await logout(); }}
