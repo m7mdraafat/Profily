@@ -125,8 +125,25 @@ public static class AuthEndpoints
             });
         
         // Redirect to the original return URL or home
-        var validReturnUrl = ValidateReturnUrl(returnUrl) ?? "http://localhost:5183/";
-        return Results.Redirect(validReturnUrl);
+        var frontendBaseUrl = "http://localhost:5183";
+        var validReturnUrl = ValidateReturnUrl(returnUrl);
+        
+        // Convert relative URLs to absolute frontend URLs
+        string redirectUrl;
+        if (validReturnUrl is null)
+        {
+            redirectUrl = frontendBaseUrl;
+        }
+        else if (validReturnUrl.StartsWith('/'))
+        {
+            redirectUrl = $"{frontendBaseUrl}{validReturnUrl}";
+        }
+        else
+        {
+            redirectUrl = validReturnUrl;
+        }
+        
+        return Results.Redirect(redirectUrl);
     }
 
 
@@ -163,6 +180,7 @@ public static class AuthEndpoints
             {
                 Id = user.Id,
                 GitHubUsername = user.GitHubUsername,
+                Name = user.Name,
                 Email = user.Email,
                 AvatarUrl = user.AvatarUrl,
                 CreatedAt = user.CreatedAt

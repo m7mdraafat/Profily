@@ -7,6 +7,7 @@ public sealed record UserInfoResponse
 {
     public required string Id { get; init; }
     public required string GitHubUsername { get; init; }
+    public string? Name { get; init; }
     public string? Email { get; init; }
     public string? AvatarUrl { get; init; }
     public DateTime CreatedAt { get; init; }

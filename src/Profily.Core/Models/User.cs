@@ -7,6 +7,12 @@ public class User
     [JsonPropertyName("id")]
     public required string Id { get; set; }
 
+    /// <summary>
+    /// Partition key - mirrors Id for Cosmos DB partitioning.
+    /// </summary>
+    [JsonPropertyName("userId")]
+    public string UserId => Id;
+
     [JsonPropertyName("type")]
     public string Type { get; set; } = "user";
 
@@ -15,6 +21,12 @@ public class User
 
     [JsonPropertyName("githubUsername")]
     public required string GitHubUsername { get; set; }
+
+    /// <summary>
+    /// GitHub display name (may differ from username).
+    /// </summary>
+    [JsonPropertyName("name")]
+    public string? Name { get; set; }
 
     [JsonPropertyName("email")]
     public string? Email { get; set; }

@@ -74,10 +74,11 @@ public static class AuthenticationExtensions
             options.ClaimActions.MapJsonKey(ClaimTypes.Name, "login");
             options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
             options.ClaimActions.MapJsonKey("urn:github:name", "name");
+            options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
             options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
         });
 
-        services.AddAuthentication();
+        services.AddAuthorization();
         
         return services;
     }

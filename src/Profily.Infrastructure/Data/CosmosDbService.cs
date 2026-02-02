@@ -30,7 +30,7 @@ public class CosmosDbService : ICosmosDbService
         {
             var response = await _container.ReadItemAsync<User>(
                 id: userId,
-                partitionKey: new PartitionKey(userId),
+                partitionKey: new PartitionKey(userId), // Partition key is /userId which mirrors id
                 cancellationToken: cancellationToken
             );
             return response.Resource;
@@ -71,7 +71,7 @@ public class CosmosDbService : ICosmosDbService
         
         var response = await _container.UpsertItemAsync(
             item: user,
-            partitionKey: new PartitionKey(user.Id),
+            partitionKey: new PartitionKey(user.UserId),
             cancellationToken: cancellationToken
         );
 
@@ -87,7 +87,7 @@ public class CosmosDbService : ICosmosDbService
         {
             await _container.DeleteItemAsync<User>(
                 id: userId,
-                partitionKey: new PartitionKey(userId),
+                partitionKey: new PartitionKey(userId), // Partition key is /userId which mirrors id
                 cancellationToken: cancellationToken
             );
             _logger.LogInformation("Deleted user {UserId}", userId);
