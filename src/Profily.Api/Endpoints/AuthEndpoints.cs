@@ -125,7 +125,6 @@ public static class AuthEndpoints
             });
         
         // Redirect to the original return URL or home
-<<<<<<< HEAD
         var frontendBaseUrl = "http://localhost:5183";
         var validReturnUrl = ValidateReturnUrl(returnUrl);
         
@@ -145,10 +144,6 @@ public static class AuthEndpoints
         }
         
         return Results.Redirect(redirectUrl);
-=======
-        var validReturnUrl = ValidateReturnUrl(returnUrl) ?? "http://localhost:5183/";
-        return Results.Redirect(validReturnUrl);
->>>>>>> a5348cb8cf9e3913608c9153275d45be2e5b176b
     }
 
 
