@@ -1,26 +1,31 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { GlowBackground } from '../GlowBackground/GlowBackground';
-import { Menu, X, Sparkles, Github, Heart, Twitter, Linkedin } from 'lucide-react';
+import { Menu, X, Sparkles, Github, Heart, Twitter, Linkedin, Loader2, LogOut } from 'lucide-react';
 import { styles, getNavLinkClass, getMobileNavClass } from './Layout.styles';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false); 
   const location = useLocation();
+  const { user, isAuthenticated, isLoading, login, logout} = useAuth();
 
   // Close menu on route change
   useEffect(() => {
     setMenuOpen(false);
+    setUserMenuOpen(false);
   }, [location.pathname]);
 
   // Close menu on scroll
   useEffect(() => {
     const handleScroll = () => {
       if (menuOpen) setMenuOpen(false);
+      if (userMenuOpen) setUserMenuOpen(false);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [menuOpen]);
+  }, [menuOpen, userMenuOpen]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -28,7 +33,23 @@ export function Layout() {
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
 
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuOpen && !(event.target as Element).closest('[data-user-menu')) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [userMenuOpen]);
+
   const closeMenu = () => setMenuOpen(false);
+  
+  const handleLogout = async () => {
+    setUserMenuOpen(false);
+    await logout();
+  }
 
   return (
     <>
@@ -59,12 +80,54 @@ export function Layout() {
             <NavLink to="/templates" className={getNavLinkClass}>Templates</NavLink>
           </nav>
 
-          {/* Auth Button */}
-          <div className={styles.header.auth.wrapper}>
-            <button className={styles.header.auth.login}>
-              <Github size={16} />
-              Sign In
-            </button>
+          {/* Auth Button / User Menu */}
+          <div className={styles.header.auth.wrapper} data-user-menu>
+            {isLoading ? (
+              <div className="flex item-center justify-center w-10 h-10">
+                <Loader2 size={20} className="animate-spin text-slate-400" />
+              </div>
+            ) : isAuthenticated && user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 p-1 rounded-full hover:bg-white/10 transition-colors"
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="true"
+                >
+                  <img
+                    src={user.avatarUrl  || `https://github/${user.gitHubUsername}.png`}
+                    alt={user.gitHubUsername}
+                    className="w-8 h-8 rounded-full border border-white/20"
+                  />
+                </button>
+
+                {/* Dropdown Menu */}
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-white/10 rounded-lg shadow-xl py-1 z-50">
+                    <div className="px-4 py-2 border-b border-white/10">
+                      <p className="text-sm font-medium text-white truncate">
+                        {user.gitHubUsername}
+                      </p>
+                      {user.email && (
+                        <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                    >
+                      <LogOut size={16} />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ): (
+              <button onClick={login} className={styles.header.auth.login}>
+                <Github size={16} />
+                Sign In
+              </button>
+            )}
           </div>
         </header>
 
@@ -82,10 +145,34 @@ export function Layout() {
           
           {/* Mobile Auth */}
           <div className={styles.header.mobileAuth.wrapper}>
-            <button className={styles.header.mobileAuth.login} onClick={closeMenu}>
-              <Github size={16} />
-              Sign In
-            </button>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-2">
+                <Loader2 size={20} className="animate-spin text-slate-400" />
+              </div>
+            ) : isAuthenticated && user ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <img
+                    src={user.avatarUrl || `https://github.com/${user.gitHubUsername}.png`}
+                    alt={user.gitHubUsername}
+                    className="w-8 h-8 rounded-full border border-white/20"
+                  />
+                  <span className="text-sm font-medium text-white">{user.gitHubUsername}</span>
+                </div>
+                <button
+                  onClick={async () => {closeMenu(); await logout(); }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  <LogOut size={16} />
+                  SignOut 
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => { closeMenu(); login(); }} className={styles.header.mobileAuth.login}>
+                <Github size={16} />
+                Sign In
+              </button>
+            )}
           </div>
         </nav>
 
