@@ -5,6 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.9" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.57.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.2" />

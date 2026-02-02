@@ -1,3 +1,4 @@
+using Profily.Api.Endpoints;
 using Profily.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,13 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
+// Security middlewares
 app.UseHttpsRedirection();
+app.UseCors(CorsExtensions.PolicyName);
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapAuthEndpoints();
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
 	.WithName("Health")
