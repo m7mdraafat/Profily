@@ -24,6 +24,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapAuthEndpoints();
+app.MapGitHubEndpoints();
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
 	.WithName("Health")
