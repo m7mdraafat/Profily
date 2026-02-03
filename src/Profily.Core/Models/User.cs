@@ -2,19 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace Profily.Core.Models;
 
-public class User
+public sealed class User : CosmosDocument
 {
-    [JsonPropertyName("id")]
-    public required string Id { get; set; }
-
-    /// <summary>
-    /// Partition key - mirrors Id for Cosmos DB partitioning.
-    /// </summary>
-    [JsonPropertyName("userId")]
-    public string UserId => Id;
+    public const string DocumentType = "user";
 
     [JsonPropertyName("type")]
-    public string Type { get; set; } = "user";
+    public override string Type => DocumentType;
 
     [JsonPropertyName("githubId")]
     public long GitHubId { get; set; }
@@ -36,10 +29,4 @@ public class User
 
     [JsonPropertyName("accessToken")]
     public string? AccessToken { get; set; }
-
-    [JsonPropertyName("createdAt")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    [JsonPropertyName("updatedAt")]
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }
