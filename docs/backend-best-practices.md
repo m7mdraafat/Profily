@@ -11,10 +11,12 @@ This document outlines the production best practices applied in the Profily back
 3. [Authentication & Authorization](#authentication--authorization)
 4. [Security](#security)
 5. [Database Design](#database-design)
-6. [API Design](#api-design)
-7. [Error Handling](#error-handling)
-8. [Logging & Observability](#logging--observability)
-9. [Dependency Injection](#dependency-injection)
+6. [External API Integration](#external-api-integration)
+7. [Caching Strategy](#caching-strategy)
+8. [API Design](#api-design)
+9. [Error Handling](#error-handling)
+10. [Logging & Observability](#logging--observability)
+11. [Dependency Injection](#dependency-injection)
 
 ---
 
@@ -257,6 +259,169 @@ _logger.LogInformation(
 
 ---
 
+## External API Integration
+
+### GitHub API with Octokit
+
+We use [Octokit.NET](https://github.com/octokit/octokit.net) - the official GitHub API client:
+
+```csharp
+// ✅ Good: Create client per request with user's token
+private static GitHubClient CreateClient(string accessToken)
+{
+    var client = new GitHubClient(new ProductHeaderValue("Profily"))
+    {
+        Credentials = new Credentials(accessToken)
+    };
+    return client;
+}
+```
+
+### User Token Strategy
+
+Use the authenticated user's access token for GitHub API calls:
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **User Token** ✅ | Higher rate limits (5000/hr), access to user data | Token per user |
+| App Token | Single token | Lower rate limits, no user context |
+
+```csharp
+// Get user's token from database
+var user = await authService.GetUserByIdAsync(userId);
+var repos = await gitHubService.GetUserRepositoriesAsync(user.AccessToken);
+```
+
+### Data Storage Strategy
+
+| Data Type | Store in DB? | Reason |
+|-----------|--------------|--------|
+| Raw GitHub repos/stats | ❌ No | Changes frequently, GitHub is source of truth |
+| User's selected projects | ✅ Yes | User's portfolio choices |
+| Project customizations | ✅ Yes | Overridden titles, descriptions, images |
+| Portfolio configuration | ✅ Yes | Theme, layout, sections |
+
+```csharp
+// ❌ Don't store: Fetched from GitHub with caching
+public class GitHubRepository { ... }  // Live data
+public class GitHubStats { ... }       // Live data
+
+// ✅ Do store: User's selections and customizations
+public class SelectedProject
+{
+    public string UserId { get; set; }        // Partition key
+    public long RepoId { get; set; }          // GitHub repo ID
+    public string? DisplayTitle { get; set; } // Override
+    public bool IsFeatured { get; set; }
+}
+```
+
+### Model Mapping
+
+Convert external API types to our domain models:
+
+```csharp
+// ✅ Good: Map Octokit types to our clean models
+private static GitHubRepository MapToGitHubRepository(Repository repo)
+{
+    return new GitHubRepository
+    {
+        Id = repo.Id,
+        Name = repo.Name,
+        FullName = repo.FullName,
+        StarsCount = repo.StargazersCount,
+        // ... only properties we need
+    };
+}
+
+// ❌ Bad: Exposing Octokit types directly
+return Results.Ok(octokitRepos);  // Leaks implementation details
+```
+
+---
+
+## Caching Strategy
+
+### In-Memory Cache for External APIs
+
+Protect against rate limits and improve performance:
+
+```csharp
+public class GitHubService : IGitHubService
+{
+    private readonly IMemoryCache _cache;
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+
+    public async Task<List<GitHubRepository>> GetUserRepositoriesAsync(string accessToken)
+    {
+        var cacheKey = $"repos_{accessToken.GetHashCode()}";
+
+        if (_cache.TryGetValue(cacheKey, out List<GitHubRepository>? cached))
+        {
+            _logger.LogDebug("Cache hit for {CacheKey}", cacheKey);
+            return cached;
+        }
+
+        // Fetch from GitHub API
+        var repos = await FetchFromGitHub(accessToken);
+        
+        _cache.Set(cacheKey, repos, CacheDuration);
+        return repos;
+    }
+}
+```
+
+### Cache Key Design
+
+| Pattern | Example | Use Case |
+|---------|---------|----------|
+| `{type}_{userId}` | `repos_abc123` | User-specific data |
+| `{type}_{owner}_{repo}` | `lang_octokit_octokit.net` | Repository-specific data |
+
+### Cache Duration Guidelines
+
+| Data Type | Duration | Reason |
+|-----------|----------|--------|
+| User repos | 10 minutes | Balance freshness vs. rate limits |
+| User stats | 10 minutes | Aggregate data changes slowly |
+| Repo languages | 10 minutes | Rarely changes |
+| Static config | 1 hour+ | Configuration rarely changes |
+
+### Rate Limit Protection
+
+```csharp
+// Limit expensive operations
+var topRepos = ownedRepos
+    .OrderByDescending(r => r.StargazersCount)
+    .Take(10);  // Only fetch languages for top 10 repos
+
+foreach (var repo in topRepos)
+{
+    try
+    {
+        var languages = await client.Repository.GetAllLanguages(repo.Owner.Login, repo.Name);
+        // Process...
+    }
+    catch (RateLimitExceededException ex)
+    {
+        _logger.LogWarning("GitHub rate limit exceeded. Reset at {ResetTime}", ex.Reset);
+        break;  // Stop making requests
+    }
+}
+```
+
+### Service Registration
+
+```csharp
+// Register memory cache
+services.AddMemoryCache();
+
+// Register GitHub service
+services.AddScoped<IGitHubService, GitHubService>();
+```
+
+---
+
 ## API Design
 
 ### Minimal API Organization
@@ -397,7 +562,9 @@ _logger.LogInformation(
 |---------|----------|--------|
 | `CosmosClient` | Singleton | Thread-safe, connection pooling |
 | `CosmosDbService` | Singleton | Stateless, uses singleton client |
+| `IMemoryCache` | Singleton | Shared cache across requests |
 | `AuthService` | Scoped | Per-request, may have request-specific state |
+| `GitHubService` | Scoped | Uses per-user access tokens |
 
 ### Extension Methods for Registration
 
@@ -408,10 +575,12 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddMemoryCache();  // For caching external API responses
         services.AddCosmosDb(configuration);
         services.AddGitHubAuthentication(configuration);
         services.AddProfilyCors(configuration);
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IGitHubService, GitHubService>();
 
         return services;
     }
@@ -443,6 +612,14 @@ services.AddSingleton<CosmosDbService>();
 - [ ] Add secrets to `user-secrets` (dev) or Key Vault (prod)
 - [ ] Update `appsettings.template.json`
 
+### For External API Integrations
+
+- [ ] Add caching with appropriate TTL
+- [ ] Map external types to domain models
+- [ ] Handle rate limits gracefully
+- [ ] Decide: Store in DB or fetch with cache?
+- [ ] Use user tokens when available (higher rate limits)
+
 ---
 
 ## References
@@ -451,3 +628,6 @@ services.AddSingleton<CosmosDbService>();
 - [Options Pattern in ASP.NET Core](https://docs.microsoft.com/aspnet/core/fundamentals/configuration/options)
 - [Azure Cosmos DB Best Practices](https://docs.microsoft.com/azure/cosmos-db/best-practices)
 - [Minimal APIs Overview](https://docs.microsoft.com/aspnet/core/fundamentals/minimal-apis)
+- [Octokit.NET Documentation](https://octokitnet.readthedocs.io/)
+- [GitHub API Rate Limits](https://docs.github.com/en/rest/rate-limit)
+- [Memory Cache in ASP.NET Core](https://docs.microsoft.com/aspnet/core/performance/caching/memory)
