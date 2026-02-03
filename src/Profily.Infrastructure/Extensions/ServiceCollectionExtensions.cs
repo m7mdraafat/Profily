@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Profily.Core.Interfaces;
 using Profily.Core.Options;
 using Profily.Infrastructure.Data;
+using Profily.Infrastructure.Data.Repositories;
 using Profily.Infrastructure.GitHub;
 using Profily.Infrastructure.Services;
 
@@ -55,7 +56,12 @@ public static class ServiceCollectionExtensions
                 clientOptions);
         });
 
-        services.AddSingleton<ICosmosDbService, CosmosDbService>();
+        // Generic document repository (singleton - stateless, thread-safe)
+        services.AddSingleton<CosmosDocumentRepository>();
+        services.AddSingleton<IDocumentRepository>(sp => sp.GetRequiredService<CosmosDocumentRepository>());
+
+        // Domain-specific repositories (scoped - request isolation)
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }
