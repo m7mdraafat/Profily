@@ -1,4 +1,5 @@
 import type { AuthResponse } from "../types/auth";
+import type { GitHubRepository, GitHubStats, LanguageStat } from "../types/github";
 
 const API_BASE = '/api';
 
@@ -82,4 +83,30 @@ export async function logout(): Promise<void> {
 export function getLoginUrl(returnUrl?: string) : string {
     const params = returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : '';
     return `${API_BASE}/auth/github/${params}`;
+}
+
+// ============== GitHub ===============
+
+/**
+ * Fetches the authenticated user's GitHub repositories.
+ */
+export async function getRepositories() : Promise<GitHubRepository[]> {
+    return request<GitHubRepository[]>('/github/repos');
+}
+
+/**
+ * Fetches aggregated GitHub statistics for the authenticated user.
+ */
+export async function getGitHubStats() : Promise<GitHubStats> {
+    return request<GitHubStats>('/github/stats');
+}
+
+/**
+ * Fetches language breakdown for a specific repository.
+ */
+export async function getRepositoryLanguages(
+    owner: string,
+    repo: string
+) : Promise<LanguageStat[]> {
+    return request<LanguageStat[]>(`/github/repos/${owner}/${repo}/languages`);
 }
