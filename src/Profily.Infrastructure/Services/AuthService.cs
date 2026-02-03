@@ -5,16 +5,16 @@ using Profily.Core.Models;
 
 namespace Profily.Infrastructure.Services;
 
-public class AuthService : IAuthService
+public sealed class AuthService : IAuthService
 {
-    private readonly ICosmosDbService _cosmosDbService;
+    private readonly IUserRepository _userRepository;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
-        ICosmosDbService cosmosDbService,
+        IUserRepository userRepository,
         ILogger<AuthService> logger)
     {
-        _cosmosDbService = cosmosDbService;
+        _userRepository = userRepository;
         _logger = logger;
     }
     
@@ -31,7 +31,7 @@ public class AuthService : IAuthService
         var name = principal.FindFirst("urn:github:name")?.Value;
 
         // Check if user exists
-        var existingUser = await _cosmosDbService.GetUserByGitHubIdAsync(githubId);
+        var existingUser = await _userRepository.GetByGitHubIdAsync(githubId);
 
         if (existingUser is not null)
         {
@@ -45,12 +45,14 @@ public class AuthService : IAuthService
             existingUser.AccessToken = accessToken;
             existingUser.UpdatedAt = DateTime.UtcNow;
 
-            return await _cosmosDbService.UpsertUserAsync(existingUser);
+            return await _userRepository.UpsertAsync(existingUser);
         }
 
+        var userId = Guid.NewGuid().ToString();
         var newUser = new User
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = userId,
+            UserId = userId, // Partition key = Id for users
             GitHubId = githubId,
             GitHubUsername = username,
             Name = name,
@@ -63,11 +65,11 @@ public class AuthService : IAuthService
 
         _logger.LogInformation("New user registered: {Username} (ID: {UserId})", username, newUser.Id);
 
-        return await _cosmosDbService.UpsertUserAsync(newUser);
+        return await _userRepository.UpsertAsync(newUser);
     }
 
     public async Task<User?> GetUserByIdAsync(string userId)
     {
-        return await _cosmosDbService.GetUserByIdAsync(userId);
+        return await _userRepository.GetByIdAsync(userId);
     }
 }
