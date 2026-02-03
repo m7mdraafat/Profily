@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Profily.Core.Interfaces;
 using Profily.Core.Options;
 using Profily.Infrastructure.Data;
+using Profily.Infrastructure.GitHub;
 using Profily.Infrastructure.Services;
 
 namespace Profily.Infrastructure.Extensions;
@@ -15,6 +16,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddMemoryCache();
         services.AddCosmosDb(configuration);
         services.AddGitHubAuthentication(configuration);
         services.AddProfilyCors(configuration);
@@ -62,6 +64,7 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IGitHubService, GitHubService>();
 
         return services;
     }
