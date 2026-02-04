@@ -19,6 +19,10 @@ public class GitHubStats
     public int Followers { get; set; }
     [JsonPropertyName("following")]
     public int Following { get; set; }
+
+    [JsonPropertyName("totalCommits")]
+    public int TotalCommits { get; set; } = 0;
+    
     [JsonPropertyName("topLanguages")]
     public List<LanguageStat> TopLanguages { get; set; } = [];
     [JsonPropertyName("fetchedAt")]
