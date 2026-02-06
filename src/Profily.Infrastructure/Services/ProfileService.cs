@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Profily.Core.Interfaces;
 using Profily.Core.Models.Profile;
 
@@ -12,18 +11,18 @@ public sealed class ProfileService : IProfileService
 {
     private readonly IDocumentRepository _repository;
     private readonly ITemplateService _templateService;
-    private readonly ILogger<ProfileService> _logger;
+    private readonly IWideEventAccessor _wideEvent;
 
     private const int MaxDeployHistoryLimit = 50;
 
     public ProfileService(
         IDocumentRepository repository,
         ITemplateService templateService,
-        ILogger<ProfileService> logger)
+        IWideEventAccessor wideEvent)
     {
         _repository = repository;
         _templateService = templateService;
-        _logger = logger;
+        _wideEvent = wideEvent;
     }
 
     /// <inheritdoc />
@@ -43,7 +42,7 @@ public sealed class ProfileService : IProfileService
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(config.UserId);
 
-        _logger.LogDebug("Saving profile config for user {UserId}", config.UserId);
+        _wideEvent.WideEvent?.Set("profile.operation", "save_config");
 
         return await _repository.UpsertAsync(config, ct);
     }
@@ -53,7 +52,8 @@ public sealed class ProfileService : IProfileService
         ArgumentException.ThrowIfNullOrWhiteSpace(userId);
         ArgumentException.ThrowIfNullOrWhiteSpace(templateSlug);
 
-        _logger.LogDebug("Creating profile config for user {UserId} from template {TemplateSlug}", userId, templateSlug);
+        _wideEvent.WideEvent?.Set("profile.operation", "create_from_template");
+        _wideEvent.WideEvent?.Set("profile.template_slug", templateSlug);
 
         var template = await _templateService.GetTemplateBySlugAsync(templateSlug, ct)
             ?? throw new ArgumentException($"Template '{templateSlug}' not found or inactive.", nameof(templateSlug));
@@ -69,7 +69,7 @@ public sealed class ProfileService : IProfileService
         
         var configId = $"{ProfileConfig.DocumentType}-{userId}";
 
-        _logger.LogInformation("Deleting profile config for user {UserId}", userId);
+        _wideEvent.WideEvent?.Set("profile.operation", "delete_config");
 
         await _repository.DeleteAsync(
             id: configId,
@@ -117,9 +117,12 @@ public sealed class ProfileService : IProfileService
         ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(result);
 
-        _logger.LogInformation(
-            "Recording deploy for user {UserId}: Success={Success}, Message={Message}",
-            userId, result.Success, result.ErrorMessage ?? "Success");
+        _wideEvent.WideEvent?.Set("profile.operation", "record_deploy");
+        _wideEvent.WideEvent?.Set("profile.deploy.success", result.Success);
+        if (!result.Success)
+        {
+            _wideEvent.WideEvent?.Set("profile.deploy.error", result.ErrorMessage);
+        }
 
         // Create immutable deploy record
         var deploy = DeployHistory.Create(

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Microsoft.Extensions.Logging;
 using Profily.Core.Interfaces;
 using Profily.Core.Models;
 
@@ -8,14 +7,14 @@ namespace Profily.Infrastructure.Services;
 public sealed class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-    private readonly ILogger<AuthService> _logger;
+    private readonly IWideEventAccessor _wideEvent;
 
     public AuthService(
         IUserRepository userRepository,
-        ILogger<AuthService> logger)
+        IWideEventAccessor wideEvent)
     {
         _userRepository = userRepository;
-        _logger = logger;
+        _wideEvent = wideEvent;
     }
     
     public async Task<User> ProcessOAuthLoginAsync(ClaimsPrincipal principal, string accessToken)
@@ -32,13 +31,17 @@ public sealed class AuthService : IAuthService
 
         // Check if user exists
         var existingUser = await _userRepository.GetByGitHubIdAsync(githubId);
+        var isNewUser = existingUser is null;
 
-        if (existingUser is not null)
+        // Enrich wide event with auth context
+        _wideEvent.WideEvent?.Set("auth.is_new_user", isNewUser);
+        _wideEvent.WideEvent?.Set("auth.github_id", githubId);
+        _wideEvent.WideEvent?.Set("auth.github_username", username);
+
+        if (!isNewUser)
         {
-            _logger.LogInformation("Existing user login: {Username} (ID: {UserId})", username, existingUser.Id);
-
-            // Update user info 
-            existingUser.GitHubUsername = username;
+            // Update existing user info 
+            existingUser!.GitHubUsername = username;
             existingUser.Name = name;
             existingUser.Email = email;
             existingUser.AvatarUrl = avatarUrl;
@@ -63,7 +66,7 @@ public sealed class AuthService : IAuthService
             UpdatedAt = DateTime.UtcNow
         };
 
-        _logger.LogInformation("New user registered: {Username} (ID: {UserId})", username, newUser.Id);
+        _wideEvent.WideEvent?.Set("auth.new_user_id", userId);
 
         return await _userRepository.UpsertAsync(newUser);
     }
