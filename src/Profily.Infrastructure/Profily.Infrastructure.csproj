@@ -25,4 +25,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+      <EmbeddedResource Include="Data\framework-mappings.json" />
+  </ItemGroup>
 </Project>

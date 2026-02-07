@@ -29,4 +29,25 @@ public interface IGitHubService
         string owner,
         string repoName,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the full file tree of a repository in a single API call.
+    /// Uses Git Trees API with recursive=1 to minimize API calls.
+    /// </summary>
+    Task<List<string>> GetRepoFileTreeAsync(
+        string accessToken,
+        string owner,
+        string repoName,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the raw content of a single file from a repository.
+    /// Returns null if the file is not exists or is too large (>1MB).
+    /// </summary>
+    Task<string?> GetFileContentAsync(
+        string accessToken,
+        string owner,
+        string repoName,
+        string filePath,
+        CancellationToken cancellationToken = default);
 }

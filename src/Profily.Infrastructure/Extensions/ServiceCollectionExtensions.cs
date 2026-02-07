@@ -74,6 +74,10 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IGitHubService, GitHubService>();
+
+        services.AddSingleton(_  => FrameworkMappings.LoadFromEmbeddedResource());
+        services.AddScoped<ITechStackAnalyzer, TechStackAnalyzer>();
+        
         return services;
     }
 }

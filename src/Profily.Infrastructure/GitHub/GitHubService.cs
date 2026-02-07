@@ -200,6 +200,7 @@ public class GitHubService : IGitHubService
             IsFork = repo.Fork,
             IsArchived = repo.Archived,
             IsPrivate = repo.Private,
+            Size = (int)repo.Size,
             Topics = repo.Topics?.ToList(),
             CreatedAt = repo.CreatedAt.UtcDateTime,
             UpdatedAt = repo.UpdatedAt.UtcDateTime,
@@ -229,5 +230,61 @@ public class GitHubService : IGitHubService
             "c" => "#555555",
             _ => null
         };
+    }
+
+    public async Task<List<string>> GetRepoFileTreeAsync(string accessToken, string owner, string repoName, CancellationToken cancellationToken = default)
+    {
+        var client = CreateClient(accessToken);
+        var cacheKey = $"tree_{owner}_{repoName}";
+
+        if (_memoryCache.TryGetValue(cacheKey, out List<string>? cached) && 
+            cached is not null)
+        {
+            _wideEvent.WideEvent?.Set("github.tree.cache_hit", true);
+            return cached;
+        }
+
+        try
+        {
+            var response = await client.Git.Tree.GetRecursive(owner, repoName, "HEAD");
+
+            var result = response.Tree
+                .Where(item => item.Type == TreeType.Blob) // Only files, ignore submodules and symlinks
+                .Select(item => item.Path)
+                .ToList();
+            
+            _wideEvent.WideEvent?.Set($"github.tree.{repoName}.files_count", result.Count);
+            _memoryCache.Set(cacheKey, result, CacheDuration);
+            return result;
+        }
+        catch (NotFoundException)
+        {
+            _wideEvent.WideEvent?.Set("github.tree.not_found", true);
+            return new List<string>(); // Repo not found or empty
+        }
+    }
+
+    public async Task<string?> GetFileContentAsync(string accessToken, string owner, string repoName, string filePath, CancellationToken cancellationToken = default)
+    {
+        var client = CreateClient(accessToken);
+
+        try
+        {
+            var contents = await client.Repository.Content.GetAllContentsByRef(owner, repoName, filePath, "HEAD");
+
+            var file = contents.FirstOrDefault();
+            if (file is null || file.Size > 1_048_576) // >1MB
+            {
+                _wideEvent.WideEvent?.Set("github.file_content.too_large", true);
+                return null;
+            }
+
+            return file.Content; // Base64 decoded by Octokit
+        }
+        catch (NotFoundException)
+        {
+            _wideEvent.WideEvent?.Set("github.file_content.not_found", true);
+            return null;
+        }
     }
 }

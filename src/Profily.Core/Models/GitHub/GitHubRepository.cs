@@ -43,6 +43,9 @@ public class GitHubRepository
     [JsonPropertyName("isPrivate")]
     public bool IsPrivate { get; set; }
 
+    [JsonPropertyName("size")]
+    public int Size { get; set; } // size in KB
+
     [JsonPropertyName("topics")]
     public List<string>? Topics { get; set; }
 

@@ -41,7 +41,8 @@ try {
 
 	app.MapAuthEndpoints();
 	app.MapGitHubEndpoints();
-
+	app.MapTechStackEndpoints();
+	
 	app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
 		.WithName("Health")
 		.WithOpenApi();
