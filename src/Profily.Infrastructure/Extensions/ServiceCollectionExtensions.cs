@@ -5,7 +5,6 @@ using Profily.Core.Interfaces;
 using Profily.Core.Options;
 using Profily.Infrastructure.Data;
 using Profily.Infrastructure.Data.Repositories;
-using Profily.Infrastructure.Data.Seeding;
 using Profily.Infrastructure.GitHub;
 using Profily.Infrastructure.Services;
 
@@ -23,7 +22,6 @@ public static class ServiceCollectionExtensions
         services.AddGitHubAuthentication(configuration);
         services.AddProfilyCors(configuration);
         services.AddServices();
-        services.AddDataSeeders();
         return services;
     }
     /// <summary>
@@ -76,9 +74,6 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IGitHubService, GitHubService>();
-        services.AddScoped<ITemplateService, TemplateService>();
-        services.AddScoped<IProfileService, ProfileService>();
-        services.AddScoped<IReadmeGeneratorService, ReadmeGeneratorService>();
         return services;
     }
 }

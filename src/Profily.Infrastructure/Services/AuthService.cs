@@ -22,7 +22,7 @@ public sealed class AuthService : IAuthService
         var githubIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
             ?? throw new InvalidOperationException("GitHub ID claim not found.");
         
-        var githubId = int.Parse(githubIdClaim);
+        var githubId = long.Parse(githubIdClaim);
         var username = principal.FindFirst(ClaimTypes.Name)?.Value
             ?? throw new InvalidOperationException("GitHub username claim not found.");
         var email = principal.FindFirst(ClaimTypes.Email)?.Value;

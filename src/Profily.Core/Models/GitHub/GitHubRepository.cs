@@ -43,9 +43,6 @@ public class GitHubRepository
     [JsonPropertyName("isPrivate")]
     public bool IsPrivate { get; set; }
 
-    [JsonPropertyName("languages")]
-    public List<string>? Languages { get; set; }
-
     [JsonPropertyName("topics")]
     public List<string>? Topics { get; set; }
 
