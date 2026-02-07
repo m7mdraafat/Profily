@@ -17,13 +17,16 @@ public sealed class ReadmeGeneratorService : IReadmeGeneratorService
 {
     private readonly ITemplateService _templateService;
     private readonly ILogger<ReadmeGeneratorService> _logger;
+    private readonly IWideEventAccessor _wideEvent;
 
     public ReadmeGeneratorService(
         ITemplateService templateService,
-        ILogger<ReadmeGeneratorService> logger)
+        ILogger<ReadmeGeneratorService> logger,
+        IWideEventAccessor wideEvent)
     {
         _templateService = templateService;
         _logger = logger;
+        _wideEvent = wideEvent;
     }
 
     public async Task<GeneratedProfile> GenerateAsync(ProfileConfig config, GitHubStats stats, List<GitHubRepository> repos, CancellationToken ct = default)
@@ -31,8 +34,6 @@ public sealed class ReadmeGeneratorService : IReadmeGeneratorService
         ArgumentNullException.ThrowIfNull(config);
         ArgumentNullException.ThrowIfNull(stats);
         ArgumentNullException.ThrowIfNull(repos);
-
-        _logger.LogDebug("Generating README for user {UserId}", config.UserId);
 
         // Get all required styles in one batch query
         var enabledSections = config.Sections
@@ -56,6 +57,7 @@ public sealed class ReadmeGeneratorService : IReadmeGeneratorService
             if (!styles.TryGetValue(sectionConfig.StyleId, out var style))
             {
                 _logger.LogWarning("Style {StyleId} not found, skipping section {SectionId}", sectionConfig.StyleId, sectionConfig.SectionId);
+                _wideEvent.WideEvent?.Set("readme.has_missing_styles", true);
                 continue;
             }
 
@@ -79,9 +81,10 @@ public sealed class ReadmeGeneratorService : IReadmeGeneratorService
             }
         }
 
-        _logger.LogInformation(
-            "Generated profile: {SectionCount} sections, {WorkflowCount} workflows, {AssetCount} assets for user {UserId}",
-            enabledSections.Count, workflows.Count, assets.Count, config.UserId);
+        // Enrich wide event with generation stats
+        _wideEvent.WideEvent?.Set("readme.sections_count", enabledSections.Count);
+        _wideEvent.WideEvent?.Set("readme.workflows_count", workflows.Count);
+        _wideEvent.WideEvent?.Set("readme.assets_count", assets.Count);
         
         return new GeneratedProfile
         {
@@ -95,8 +98,6 @@ public sealed class ReadmeGeneratorService : IReadmeGeneratorService
     {
         ArgumentNullException.ThrowIfNull(style);
         ArgumentNullException.ThrowIfNull(theme);
-
-        _logger.LogDebug("Generating section preview for style {StyleId}", style.Id);
 
         // Build preview context with sample data
         var context = BuildPreviewContext(theme);
@@ -224,6 +225,7 @@ public sealed class ReadmeGeneratorService : IReadmeGeneratorService
             if (scribanContext.HasErrors)
             {
                 _logger.LogWarning("Template parsing errors: {Errors}", string.Join(", ", scribanContext.Messages));
+                _wideEvent.WideEvent?.Set("readme.has_template_errors", true);
                 return template;
             }
 
@@ -238,6 +240,7 @@ public sealed class ReadmeGeneratorService : IReadmeGeneratorService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rendering template");
+            _wideEvent.WideEvent?.Set("readme.render_error", ex.Message);
             return template;
         }
     }

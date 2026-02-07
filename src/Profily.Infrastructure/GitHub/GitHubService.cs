@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Octokit;
 using Profily.Core.Interfaces;
 using Profily.Core.Models.GitHub;
@@ -9,15 +8,15 @@ namespace Profily.Infrastructure.GitHub;
 public class GitHubService : IGitHubService
 {
     private readonly IMemoryCache _memoryCache;
-    private readonly ILogger<GitHubService> _logger;
+    private readonly IWideEventAccessor _wideEvent;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
 
     public GitHubService(
         IMemoryCache memoryCache,
-        ILogger<GitHubService> logger)
+        IWideEventAccessor wideEvent)
     {
         _memoryCache = memoryCache;
-        _logger = logger;
+        _wideEvent = wideEvent;
     }
 
     public async Task<List<GitHubRepository>> GetUserRepositoriesAsync(string accessToken, CancellationToken cancellationToken = default)
@@ -29,11 +28,12 @@ public class GitHubService : IGitHubService
         if (_memoryCache.TryGetValue(cacheKey, out List<GitHubRepository>? cached) && 
             cached is not null)
         {
-            _logger.LogDebug("Cache hit for {CacheKey}", cacheKey);
+            _wideEvent.WideEvent?.Set("github.repos.cache_hit", true);
             return cached;
         }
 
-        _logger.LogInformation("Fetching repositories for {Username}", user.Login);
+        _wideEvent.WideEvent?.Set("github.repos.cache_hit", false);
+        _wideEvent.WideEvent?.Set("github.repos.username", user.Login);
 
         var repos = await client.Repository.GetAllForCurrent(new RepositoryRequest
         {
@@ -46,6 +46,7 @@ public class GitHubService : IGitHubService
             .Select(MapToGitHubRepository)
             .ToList();
 
+        _wideEvent.WideEvent?.Set("github.repos.count", result.Count);
         _memoryCache.Set(cacheKey, result, CacheDuration);
 
         return result;
@@ -60,11 +61,12 @@ public class GitHubService : IGitHubService
         if (_memoryCache.TryGetValue(cacheKey, out GitHubStats? cached) && 
             cached is not null)
         {
-            _logger.LogDebug("Cache hit for {CacheKey}", cacheKey);
+            _wideEvent.WideEvent?.Set("github.stats.cache_hit", true);
             return cached;
         }
 
-        _logger.LogInformation("Fetching stats for {Username}", user.Login);
+        _wideEvent.WideEvent?.Set("github.stats.cache_hit", false);
+        _wideEvent.WideEvent?.Set("github.stats.username", user.Login);
 
         // Get all repositories to aggregate stats
         var repos = await client.Repository.GetAllForCurrent(new RepositoryRequest
@@ -80,11 +82,13 @@ public class GitHubService : IGitHubService
             .OrderByDescending(r => r.StargazersCount)
             .Take(10);
         
+        var languageReposFetched = 0;
         foreach (var repo in topRepos)
         {
             try
             {
                 var languages = await client.Repository.GetAllLanguages(repo.Owner.Login, repo.Name);
+                languageReposFetched++;
                 foreach (var language in languages)
                 {
                     if (languageBytes.ContainsKey(language.Name))
@@ -99,10 +103,14 @@ public class GitHubService : IGitHubService
             }
             catch (RateLimitExceededException ex)
             {
-                _logger.LogWarning("GitHub rate limit exceeded. Reset at {ResetTime}", ex.Reset);
+                _wideEvent.WideEvent?.Set("github.rate_limit_exceeded", true);
+                _wideEvent.WideEvent?.Set("github.rate_limit_reset", ex.Reset.ToString("o"));
                 break;  // Stop making requests
             }
         }
+
+        _wideEvent.WideEvent?.Set("github.stats.language_repos_fetched", languageReposFetched);
+        _wideEvent.WideEvent?.Set("github.stats.languages_count", languageBytes.Count);
 
         var totalBytes = languageBytes.Values.Sum();
         var topLanguages = languageBytes
@@ -141,9 +149,11 @@ public class GitHubService : IGitHubService
         if (_memoryCache.TryGetValue(cacheKey, out List<LanguageStat>? cached ) && 
             cached is not null)
         {
-            _logger.LogDebug("Cache hit for {CacheKey}", cacheKey);
+            _wideEvent.WideEvent?.Set("github.languages.cache_hit", true);
             return cached;
         }
+
+        _wideEvent.WideEvent?.Set("github.languages.cache_hit", false);
 
         var languages = await client.Repository.GetAllLanguages(owner, repoName);
         var totalBytes = languages.Sum(l => l.NumberOfBytes);

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Profily.Api.Extensions;
 using Profily.Core.Interfaces;
 using Profily.Core.Models.Auth;
 using Profily.Infrastructure.Extensions;
@@ -50,6 +51,11 @@ public static class AuthEndpoints
     {
         // Validate return URL to prevent open redirect attacks
         var validateReturnUrl = ValidateReturnUrl(returnUrl) ?? "/";
+
+        var wideEvent = context.GetWideEvent();
+        wideEvent?.Set("auth.action", "login_initiate");
+        wideEvent?.Set("auth.provider", "github");
+        wideEvent?.Set("auth.return_url", validateReturnUrl);
 
         var properties = new AuthenticationProperties
         {
@@ -143,6 +149,13 @@ public static class AuthEndpoints
             redirectUrl = validReturnUrl;
         }
         
+        var wideEvent = context.GetWideEvent();
+        wideEvent?.Set("auth.action", "oauth_callback");
+        wideEvent?.Set("auth.provider", "github");
+        wideEvent?.Set("auth.is_new_user", user.CreatedAt == user.UpdatedAt);
+        wideEvent?.Set("user.github_id", user.GitHubId);
+        wideEvent?.Set("user.github_username", user.GitHubUsername);
+
         return Results.Redirect(redirectUrl);
     }
 
@@ -154,10 +167,14 @@ public static class AuthEndpoints
         HttpContext context,
         IAuthService authService)
     {
+        var wideEvent = context.GetWideEvent();
+        wideEvent?.Set("auth.action", "get_current_user");
+
         var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(userId))
         {
+            wideEvent?.Set("auth.result", "no_user_claim");
             return Results.Json(
                 new AuthResponse { IsAuthenticated = false },
                 statusCode: StatusCodes.Status401Unauthorized
@@ -167,11 +184,16 @@ public static class AuthEndpoints
         var user = await authService.GetUserByIdAsync(userId);
         if (user is null)
         {
+            wideEvent?.Set("auth.result", "user_not_found");
             return Results.Json(
                 new AuthResponse { IsAuthenticated = false },
                 statusCode: StatusCodes.Status401Unauthorized
             );
         }
+
+        wideEvent?.Set("auth.result", "authenticated");
+        wideEvent?.Set("user.github_username", user.GitHubUsername);
+        wideEvent?.Set("user.account_age_days", (DateTime.UtcNow - user.CreatedAt).Days);
 
         return Results.Ok(new AuthResponse
         {
@@ -193,6 +215,9 @@ public static class AuthEndpoints
     /// </summary>
     private static async Task<IResult> Logout(HttpContext context)
     {
+        var wideEvent = context.GetWideEvent();
+        wideEvent?.Set("auth.action", "logout");
+
         await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         
         return Results.Ok(new { Message = "successfully logged out" });

@@ -15,15 +15,18 @@ public sealed class UserRepository : IUserRepository
     private readonly IDocumentRepository _documentRepository;
     private readonly Container _container;
     private readonly ILogger<UserRepository> _logger;
+    private readonly IWideEventAccessor _wideEvent;
 
     public UserRepository(
         IDocumentRepository documentRepository,
         CosmosDocumentRepository cosmosRepository, // For direct container access
-        ILogger<UserRepository> logger)
+        ILogger<UserRepository> logger,
+        IWideEventAccessor wideEvent)
     {
         _documentRepository = documentRepository;
         _container = cosmosRepository.Container;
         _logger = logger;
+        _wideEvent = wideEvent;
     }
 
     /// <inheritdoc />
@@ -47,10 +50,10 @@ public sealed class UserRepository : IUserRepository
             if (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync(ct);
-                
-                _logger.LogDebug(
-                    "Query for GitHub ID {GitHubId} returned {Count} results, RU: {RU}",
-                    gitHubId, response.Count, response.RequestCharge);
+
+                _wideEvent.WideEvent?.Set("user_repo.github_id_lookup", gitHubId);
+                _wideEvent.WideEvent?.Set("user_repo.github_id_lookup_ru", response.RequestCharge);
+                _wideEvent.WideEvent?.Set("user_repo.github_id_found", response.Count > 0);
                 
                 return response.FirstOrDefault();
             }
@@ -59,6 +62,7 @@ public sealed class UserRepository : IUserRepository
         }
         catch (CosmosException ex)
         {
+            _wideEvent.WideEvent?.Set("user_repo.error", ex.Message);
             _logger.LogError(ex, "Error querying user by GitHub ID {GitHubId}", gitHubId);
             throw;
         }
@@ -67,7 +71,6 @@ public sealed class UserRepository : IUserRepository
     /// <inheritdoc />
     public async Task<User> UpsertAsync(User user, CancellationToken ct = default)
     {
-        _logger.LogDebug("Upserting user {UserId} ({GitHubUsername})", user.Id, user.GitHubUsername);
         return await _documentRepository.UpsertAsync(user, ct);
     }
 
@@ -75,6 +78,6 @@ public sealed class UserRepository : IUserRepository
     public async Task DeleteAsync(string userId, CancellationToken ct = default)
     {
         await _documentRepository.DeleteAsync(userId, userId, ct);
-        _logger.LogInformation("Deleted user {UserId}", userId);
+        _wideEvent.WideEvent?.Set("user_repo.deleted_user_id", userId);
     }
 }
