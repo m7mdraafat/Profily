@@ -21,13 +21,3 @@ public sealed record AuthResponse
     public required bool IsAuthenticated { get; init; }
     public UserInfoResponse? User { get; init; }
 }
-
-/// <summary>
-/// Standard error response for API errors.
-/// </summary>
-public sealed record ErrorResponse
-{
-    public required string Error { get; init; }
-    public string? Message { get; init; }
-    public string? TraceId { get; init; }
-}

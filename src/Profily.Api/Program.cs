@@ -1,6 +1,5 @@
 using Profily.Api.Endpoints;
 using Profily.Api.Middleware;
-using Profily.Infrastructure.Data.Seeding;
 using Profily.Infrastructure.Extensions;
 using Serilog;
 
@@ -23,8 +22,6 @@ try {
 	builder.Services.AddSwaggerGen();
 
 	var app = builder.Build();
-
-	await app.SeedDataAsync();
 
 	// Configure the HTTP request pipeline.
 	if (app.Environment.IsDevelopment())
