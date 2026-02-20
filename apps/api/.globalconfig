@@ -204,6 +204,18 @@ dotnet_diagnostic.CA5404.severity = error    # Do not disable token validation c
 dotnet_diagnostic.CA5405.severity = error    # Do not always skip token validation in delegates
 
 # ============================================
+# EF Core Entity Compatibility
+# These rules conflict with EF Core patterns.
+# Entities use string URLs (not Uri), List<T> navigations,
+# and string[]/Guid[] properties mapped to PostgreSQL arrays.
+# ============================================
+dotnet_diagnostic.CA1056.severity = none       # URI properties as strings — EF Core + JSON use strings, not Uri
+dotnet_diagnostic.CA1819.severity = none       # Array properties — Npgsql maps string[] to PostgreSQL text[]
+dotnet_diagnostic.CA1002.severity = none       # List<T> in public API — EF Core navigation properties require List<T>
+dotnet_diagnostic.CA2227.severity = none       # Collection setter — EF Core needs settable collections
+dotnet_diagnostic.MA0016.severity = none       # Collection abstraction — EF Core requires concrete List<T>
+
+# ============================================
 # Meziantou Analyzer — Key Rules
 # ============================================
 dotnet_diagnostic.MA0001.severity = error    # StringComparison is missing
