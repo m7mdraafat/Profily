@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Profily.Api/Profily.Api.csproj" />
+    <Project Path="src/Profily.Core/Profily.Core.csproj" />
+    <Project Path="src/Profily.Infrastructure/Profily.Infrastructure.csproj" />
+  </Folder>
+</Solution>
