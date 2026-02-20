@@ -17,6 +17,7 @@ public sealed class Template
     public string? LayoutUrl { get; set; }
     public string? CssUrl { get; set; }
     public string? JsUrl { get; set; }
+    public string SectionUrlsJson { get; set; } = "{}"; // jsonb: {"hero": "url", "about": "url"}
     public string[] Features { get; set; } = [];
     public string[] AvailableSections { get; set; } = [];
     public bool IsPremium { get; set; }

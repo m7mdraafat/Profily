@@ -54,8 +54,10 @@ CREATE TABLE users (
     company           VARCHAR(200),
     email             VARCHAR(320),
     github_url        TEXT NOT NULL,
-    linkedin_url      TEXT,
-    website_url       TEXT,
+
+    -- Social links — URLs only, platform derived from domain at render time
+    social_links      TEXT[] DEFAULT '{}',          -- ["https://linkedin.com/in/...", "https://leetcode.com/..."]
+
     access_token_enc  TEXT NOT NULL,                -- AES-256 encrypted GitHub token
     
     -- Aggregated GitHub data
@@ -93,10 +95,8 @@ CREATE TABLE projects (
     user_id           UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     github_repo_id    BIGINT NOT NULL,
     name              VARCHAR(200) NOT NULL,
-    full_name         VARCHAR(400),                  -- "m7mdraafat/VideStore.API"
     description       TEXT,
-    custom_description TEXT,                          -- user override
-    enhanced_description TEXT,                        -- future: DeepWiki AI
+    is_description_edited BOOLEAN DEFAULT FALSE,    -- if true, sync won't overwrite
     language          VARCHAR(50),
     topics            TEXT[] DEFAULT '{}',            -- ["dotnet", "api", "clean-architecture"]
     stars             INT DEFAULT 0,
@@ -138,7 +138,7 @@ CREATE TABLE templates (
     layout_url        TEXT,                           -- R2 URL for layout.html
     css_url           TEXT,                           -- R2 URL for style.css
     js_url            TEXT,                           -- R2 URL for main.js
-    sections_urls     JSONB DEFAULT '{}',             -- {"hero": "r2://...", "about": "r2://..."}
+    section_urls_json  JSONB DEFAULT '{}',            -- {"hero": "r2://...", "about": "r2://..."}
     
     features          TEXT[] DEFAULT '{}',            -- ["3D Effects", "Animated", "Dark Theme"]
     available_sections TEXT[] DEFAULT '{}',           -- ["hero","about","services","projects","skills","contact"]

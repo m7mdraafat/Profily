@@ -19,9 +19,6 @@ public sealed class Portfolio
     // Section configs, text overrides — stored as jsonb
     public string CustomizationsJson { get; set; } = "{}";
 
-    // Which projects are featured on the portfolio
-    public Guid[] SelectedProjectIds { get; set; } = [];
-
     // Status
     public PortfolioStatus Status { get; set; } = PortfolioStatus.Draft;
     public string? DeployedUrl { get; set; }
