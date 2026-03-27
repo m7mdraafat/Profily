@@ -1,0 +1,21 @@
+{
+  "id": "3d-purple",
+  "name": "3D Purple",
+  "description": "Modern 3D portfolio with particle effects, morphing geometry, and purple accent theme",
+  "author": "Profily",
+  "version": "1.0.0",
+  "thumbnail": "thumbnail.png",
+  "tags": ["dark", "3d", "animated"],
+  "isPro": false,
+  "sections": [
+    { "id": "hero", "name": "Hero", "required": true },
+    { "id": "about", "name": "About Me", "required": false },
+    { "id": "projects", "name": "Projects", "required": true },
+    { "id": "skills", "name": "Tech Stack", "required": true },
+    { "id": "services", "name": "Services", "required": false },
+    { "id": "experience", "name": "Experience", "required": false },
+    { "id": "education", "name": "Education", "required": false },
+    { "id": "contact", "name": "Contact", "required": false }
+  ],
+  "features": ["3D Effects", "Animated", "Dark Theme", "Custom Cursor"]
+}

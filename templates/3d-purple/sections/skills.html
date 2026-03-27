@@ -1,0 +1,74 @@
+<!-- ===== SKILLS SECTION ===== -->
+<section class="skills section" id="skills">
+    <div class="section-container">
+        <div class="section-header">
+            <span class="section-subtitle">{{ sections.skills.subtitle }}</span>
+            <h2 class="section-title">Tech <span class="gradient-text">Stack</span></h2>
+        </div>
+        <div class="skills-categories">
+            {{ if skills.languages | array.size > 0 }}
+            <div class="skill-category" data-animate>
+                <h3 class="skill-category-title">Languages</h3>
+                <div class="skill-tags">
+                    {{ for skill in skills.languages }}
+                    <span class="skill-badge">
+                        {{ if skill.icon }}
+                        <img src="icons/{{ skill.icon }}" width="20" height="20" alt="{{ skill.name }}">
+                        {{ end }}
+                        {{ skill.name }}
+                    </span>
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+
+            {{ if skills.frameworks_and_libraries | array.size > 0 }}
+            <div class="skill-category" data-animate>
+                <h3 class="skill-category-title">Frameworks & Libraries</h3>
+                <div class="skill-tags">
+                    {{ for skill in skills.frameworks_and_libraries }}
+                    <span class="skill-badge">
+                        {{ if skill.icon }}
+                        <img src="icons/{{ skill.icon }}" width="20" height="20" alt="{{ skill.name }}">
+                        {{ end }}
+                        {{ skill.name }}
+                    </span>
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+
+            {{ if skills.tools_and_platforms | array.size > 0 }}
+            <div class="skill-category" data-animate>
+                <h3 class="skill-category-title">Tools & Platforms</h3>
+                <div class="skill-tags">
+                    {{ for skill in skills.tools_and_platforms }}
+                    <span class="skill-badge">
+                        {{ if skill.icon }}
+                        <img src="icons/{{ skill.icon }}" width="20" height="20" alt="{{ skill.name }}">
+                        {{ end }}
+                        {{ skill.name }}
+                    </span>
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+
+            {{ if skills.architectural_patterns | array.size > 0 }}
+            <div class="skill-category" data-animate>
+                <h3 class="skill-category-title">Architecture</h3>
+                <div class="skill-tags">
+                    {{ for skill in skills.architectural_patterns }}
+                    <span class="skill-badge">
+                        {{ if skill.icon }}
+                        <img src="icons/{{ skill.icon }}" width="20" height="20" alt="{{ skill.name }}">
+                        {{ end }}
+                        {{ skill.name }}
+                    </span>
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+</section>

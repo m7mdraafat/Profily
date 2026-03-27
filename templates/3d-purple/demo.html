@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Mohamed Raafat — Software Engineer</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 3D Canvas Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursor-follower"></div>
+
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-inner">
+            <div class="loader-ring"></div>
+            <span class="loader-text">Loading</span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <a href="#hero" class="nav-logo">Raafat<span class="logo-dot">.</span></a>
+        <div class="nav-links">
+            <a href="#hero" class="nav-link active">Home</a>
+            <a href="#about" class="nav-link">About Me</a>
+            <a href="#projects" class="nav-link">Projects</a>
+            <a href="#skills" class="nav-link">Skills</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </div>
+        <a href="#contact" class="nav-cta btn btn-primary">Hire Me</a>
+        <button class="nav-menu-btn" id="menu-btn" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-links">
+            <a href="#hero" class="mobile-link">Home</a>
+            <a href="#about" class="mobile-link">About Me</a>
+            <a href="#projects" class="mobile-link">Projects</a>
+            <a href="#skills" class="mobile-link">Skills</a>
+            <a href="#contact" class="mobile-link">Contact</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- ===== HERO SECTION ===== -->
+        <section class="hero section" id="hero">
+            <div class="hero-content">
+                <div class="hero-left">
+                    <span class="hero-greeting">Hello, I Am</span>
+                    <h1 class="hero-name">
+                        <span class="name-first">Mohamed</span>
+                        <span class="name-last gradient-text">Raafat</span>
+                    </h1>
+                    <h2 class="hero-role">
+                        <span class="role-static">I'm a</span>
+                        <span class="role-dynamic gradient-text" id="typed-role">Software Engineer</span>
+                        <span class="typed-cursor">|</span>
+                    </h2>
+                    <p class="hero-description">
+                        Full Stack Developer skilled in .NET, React.js, and database systems. 
+                        Building scalable backend systems, AI-powered applications, and cloud-native solutions at Microsoft. 1100+ problems solved across LeetCode and Codeforces.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="#projects" class="btn btn-primary">
+                            <span>My Projects</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                        <a href="#contact" class="btn btn-outline">
+                            <span>Contact Me</span>
+                        </a>
+                    </div>
+                    <div class="hero-socials">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.744.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Twitter">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="hero-image-wrapper">
+                        <div class="hero-image-glow"></div>
+                        <div class="hero-image-border">
+                            <img src="https://avatars.githubusercontent.com/u/141199348?s=400&u=27ee52365667e0c1c16e4925e918e589b1f95a3f&v=4" alt="Mohamed Raafat" class="hero-avatar">
+                        </div>
+                        <div class="hero-float hero-float-1">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                        </div>
+                        <div class="hero-float hero-float-2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                        </div>
+                        <div class="hero-float hero-float-3">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        </div>
+                        <div class="hero-float hero-float-4">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                        <div class="hero-float hero-float-5">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-scroll-indicator">
+                <div class="scroll-mouse">
+                    <div class="scroll-wheel"></div>
+                </div>
+                <span>Scroll Down</span>
+            </div>
+        </section>
+
+        <!-- ===== ABOUT SECTION ===== -->
+        <section class="about section" id="about">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">Get To Know</span>
+                    <h2 class="section-title">About <span class="gradient-text">Me</span></h2>
+                </div>
+                <div class="about-grid">
+                    <div class="about-image-col">
+                        <div class="about-image-card">
+                            <img src="https://avatars.githubusercontent.com/u/141199348?s=400&u=27ee52365667e0c1c16e4925e918e589b1f95a3f&v=4" alt="Mohamed Raafat" class="about-avatar">
+                        </div>
+                    </div>
+                    <div class="about-info-col">
+                        <div class="about-cards">
+                            <div class="about-info-card glass-card" data-animate>
+                                <div class="info-card-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                </div>
+                                <h3>Experience</h3>
+                                <p>Microsoft</p>
+                            </div>
+                            <div class="about-info-card glass-card" data-animate>
+                                <div class="info-card-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+                                </div>
+                                <h3>Completed</h3>
+                                <p>20+ Repositories</p>
+                            </div>
+                            <div class="about-info-card glass-card" data-animate>
+                                <div class="info-card-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                </div>
+                                <h3>Contributions</h3>
+                                <p>715+ This Year</p>
+                            </div>
+                        </div>
+                        <p class="about-text">
+                            Full Stack Developer and Computer Science student skilled in .NET, React.js, and database systems. 
+                            I have experience designing clean architectures and delivering efficient, user-focused solutions. 
+                            Passionate about technology, collaboration, and driving impactful digital transformation. 
+                            Competitive programmer — placed 5th in ECPC-2024, solved 300+ problems on LeetCode and 800+ on Codeforces.
+                        </p>
+                        <a href="#contact" class="btn btn-primary about-cta">
+                            <span>Let's Talk</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PROJECTS SECTION ===== -->
+        <section class="projects section" id="projects">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">My Recent Work</span>
+                    <h2 class="section-title">Featured <span class="gradient-text">Projects</span></h2>
+                </div>
+                <div class="projects-grid">
+                    <article class="project-card" data-animate>
+                        <div class="project-image">
+                            <div class="project-image-placeholder">
+                                <div class="placeholder-pattern">
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-circle"></div>
+                                </div>
+                                <span class="placeholder-num">01</span>
+                            </div>
+                            <div class="project-overlay">
+                                <a href="https://github.com/m7mdraafat/VideStore.API" target="_blank" rel="noopener noreferrer" class="project-overlay-btn" aria-label="View source code">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3 class="project-title">VideStore API</h3>
+                            <p class="project-desc">Full-stack e-commerce API with clean architecture, JWT authentication, Google OAuth, and API versioning.</p>
+                            <div class="project-tags">
+                                <span>C#</span><span>ASP.NET Core</span><span>EF Core</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card" data-animate>
+                        <div class="project-image">
+                            <div class="project-image-placeholder purple-tint">
+                                <div class="placeholder-pattern">
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-circle"></div>
+                                </div>
+                                <span class="placeholder-num">02</span>
+                            </div>
+                            <div class="project-overlay">
+                                <a href="https://github.com/m7mdraafat/LifeAdminAgent" target="_blank" rel="noopener noreferrer" class="project-overlay-btn" aria-label="View source code">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3 class="project-title">Life Admin Agent</h3>
+                            <p class="project-desc">AI-powered personal productivity agent built with Azure AI Agent Framework, Streamlit UI, and evaluation pipeline.</p>
+                            <div class="project-tags">
+                                <span>Python</span><span>AI Agent</span><span>Azure AI</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card" data-animate>
+                        <div class="project-image">
+                            <div class="project-image-placeholder purple-tint">
+                                <div class="placeholder-pattern">
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-line"></div>
+                                    <div class="pattern-circle"></div>
+                                </div>
+                                <span class="placeholder-num">03</span>
+                            </div>
+                            <div class="project-overlay">
+                                <a href="https://github.com/m7mdraafat/phishing-detection-app" target="_blank" rel="noopener noreferrer" class="project-overlay-btn" aria-label="View source code">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-info">
+                            <h3 class="project-title">Phishing Detection App</h3>
+                            <p class="project-desc">ML-powered application that detects phishing URLs using scikit-learn classification models and Flask web interface.</p>
+                            <div class="project-tags">
+                                <span>Python</span><span>ML</span><span>Flask</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SKILLS SECTION ===== -->
+        <section class="skills section" id="skills">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">My Skills</span>
+                    <h2 class="section-title">Tech <span class="gradient-text">Stack</span></h2>
+                </div>
+                <div class="skills-categories">
+                    <div class="skill-category" data-animate>
+                        <h3 class="skill-category-title">Languages</h3>
+                        <div class="skill-tags">
+                            <span class="skill-badge">C#</span>
+                            <span class="skill-badge">C++</span>
+                            <span class="skill-badge">JavaScript</span>
+                            <span class="skill-badge">TypeScript</span>
+                            <span class="skill-badge">Java</span>
+                            <span class="skill-badge">HTML</span>
+                            <span class="skill-badge">CSS</span>
+                        </div>
+                    </div>
+                    <div class="skill-category" data-animate>
+                        <h3 class="skill-category-title">Frameworks & Libraries</h3>
+                        <div class="skill-tags">
+                            <span class="skill-badge">ASP.NET Core</span>
+                            <span class="skill-badge">ASP.NET MVC</span>
+                            <span class="skill-badge">ASP.NET Web API</span>
+                            <span class="skill-badge">React.js</span>
+                            <span class="skill-badge">Entity Framework Core</span>
+                            <span class="skill-badge">LINQ</span>
+                            <span class="skill-badge">ASP.NET Core Identity</span>
+                            <span class="skill-badge">Azure Functions</span>
+                            <span class="skill-badge">Azure Service Bus</span>
+                            <span class="skill-badge">Playwright</span>
+                            <span class="skill-badge">xUnit</span>
+                            <span class="skill-badge">JWT / OAuth</span>
+                        </div>
+                    </div>
+                    <div class="skill-category" data-animate>
+                        <h3 class="skill-category-title">Databases & Tools</h3>
+                        <div class="skill-tags">
+                            <span class="skill-badge">SQL Server</span>
+                            <span class="skill-badge">PostgreSQL</span>
+                            <span class="skill-badge">Redis</span>
+                            <span class="skill-badge">Azure Cosmos DB</span>
+                            <span class="skill-badge">MongoDB</span>
+                            <span class="skill-badge">Git</span>
+                            <span class="skill-badge">GitHub Actions</span>
+                            <span class="skill-badge">Azure DevOps</span>
+                            <span class="skill-badge">Azure AI Foundry</span>
+                            <span class="skill-badge">App Insights</span>
+                        </div>
+                    </div>
+                    <div class="skill-category" data-animate>
+                        <h3 class="skill-category-title">Architecture & Concepts</h3>
+                        <div class="skill-tags">
+                            <span class="skill-badge">Clean Architecture</span>
+                            <span class="skill-badge">N-Tier Architecture</span>
+                            <span class="skill-badge">Domain-Driven Design</span>
+                            <span class="skill-badge">SOLID Principles</span>
+                            <span class="skill-badge">Design Patterns</span>
+                            <span class="skill-badge">REST APIs</span>
+                            <span class="skill-badge">Agile / SDLC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== EXPERIENCE SECTION ===== -->
+        <section class="experience section" id="experience">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">My Journey</span>
+                    <h2 class="section-title">Work <span class="gradient-text">Experience</span></h2>
+                </div>
+                <div class="experience-timeline">
+                    <div class="timeline-item glass-card" data-animate>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h3 class="timeline-title">Software Engineer Intern</h3>
+                                <span class="timeline-company">Microsoft</span>
+                            </div>
+                            <span class="timeline-date">Feb 2025 — Present · Cairo, Egypt (Hybrid)</span>
+                            <p class="timeline-desc">Contributed to backend and frontend development of an AI-powered service generating personalized ad campaigns based on Microsoft Clarity insights, integrated with Microsoft Ads. Optimized features through batching and parallel processing. Contributed to the Playwright MCP Agent for AI-powered E2E test generation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== EDUCATION SECTION ===== -->
+        <section class="education section" id="education">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">Academic Background</span>
+                    <h2 class="section-title">My <span class="gradient-text">Education</span></h2>
+                </div>
+                <div class="education-grid">
+                    <div class="education-card glass-card" data-animate>
+                        <div class="education-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                                <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/>
+                            </svg>
+                        </div>
+                        <h3 class="education-degree">B.Sc. in Computer Science</h3>
+                        <span class="education-school">Tanta University</span>
+                        <span class="education-date">2022 — 2026 · Tanta, Egypt</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== CONTACT SECTION ===== -->
+        <section class="contact section" id="contact">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">Get In Touch</span>
+                    <h2 class="section-title">Contact <span class="gradient-text">Me</span></h2>
+                </div>
+                <div class="contact-grid">
+                    <div class="contact-info-col">
+                        <p class="contact-intro">
+                            Have a project in mind? Let's work together to create something amazing. 
+                            Feel free to reach out — I'm always open to new opportunities.
+                        </p>
+                        <div class="contact-details">
+                            <div class="contact-detail-item glass-card" data-animate>
+                                <div class="detail-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                </div>
+                                <div>
+                                    <h4>Email</h4>
+                                    <a href="mailto:mohamedraafat.engineer@gmail.com">mohamedraafat.engineer@gmail.com</a>
+                                </div>
+                            </div>
+                            <div class="contact-detail-item glass-card" data-animate>
+                                <div class="detail-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                </div>
+                                <div>
+                                    <h4>Location</h4>
+                                    <span>Egypt</span>
+                                </div>
+                            </div>
+                            <div class="contact-detail-item glass-card" data-animate>
+                                <div class="detail-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                </div>
+                                <div>
+                                    <h4>Freelance</h4>
+                                    <span class="status-available">Available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-form-col">
+                        <form class="contact-form glass-card" id="contact-form">
+                            <div class="form-group">
+                                <input type="text" id="name" name="name" placeholder="Your Name" required autocomplete="name">
+                            </div>
+                            <div class="form-group">
+                                <input type="email" id="email" name="email" placeholder="Your Email" required autocomplete="email">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="subject" name="subject" placeholder="Subject">
+                            </div>
+                            <div class="form-group">
+                                <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full">
+                                <span>Send Message</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <a href="#hero" class="footer-logo">Raafat<span class="logo-dot">.</span></a>
+            <div class="footer-links">
+                <a href="#hero">Home</a>
+                <a href="#about">About</a>
+                <a href="#projects">Projects</a>
+                <a href="#skills">Skills</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div class="footer-socials">
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.744.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Mohamed Raafat. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!-- ===== HERO SECTION ===== -->
+<section class="hero section" id="hero">
+    <div class="hero-content">
+        <div class="hero-left">
+            <span class="hero-greeting">{{ sections.hero.greeting }}</span>
+            <h1 class="hero-name">
+                <span class="name-first">{{ profile.name | string.split ' ' | array.first }}</span>
+                <span class="name-last gradient-text">{{ profile.name | string.split ' ' | array.last }}</span>
+            </h1>
+            <h2 class="hero-role">
+                <span class="role-static">I'm a</span>
+                <span class="role-dynamic gradient-text" id="typed-role">Software Engineer</span>
+                <span class="typed-cursor">|</span>
+            </h2>
+            <p class="hero-description">
+                {{ profile.bio }}
+            </p>
+            <div class="hero-cta">
+                <a href="#projects" class="btn btn-primary">
+                    <span>My Projects</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="#contact" class="btn btn-outline">
+                    <span>Contact Me</span>
+                </a>
+            </div>
+            <div class="hero-socials">
+                {{ for social in socials }}
+                <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="{{ social.platform }}">
+                    <img src="icons/{{ social.icon }}" width="20" height="20" alt="{{ social.platform }}">
+                </a>
+                {{ end }}
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="hero-image-wrapper">
+                <div class="hero-image-glow"></div>
+                <div class="hero-image-border">
+                    {{ if profile.avatar_url }}
+                    <img src="{{ profile.avatar_url }}" alt="{{ profile.name }}" class="hero-avatar">
+                    {{ else }}
+                    <div class="hero-image-placeholder">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="rgba(168,85,247,0.4)" stroke-width="1">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>Your Photo</span>
+                    </div>
+                    {{ end }}
+                </div>
+                <!-- Floating elements around image -->
+                <div class="hero-float hero-float-1">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                </div>
+                <div class="hero-float hero-float-2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                </div>
+                <div class="hero-float hero-float-3">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                </div>
+                <div class="hero-float hero-float-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div class="hero-float hero-float-5">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-scroll-indicator">
+        <div class="scroll-mouse">
+            <div class="scroll-wheel"></div>
+        </div>
+        <span>Scroll Down</span>
+    </div>
+</section>

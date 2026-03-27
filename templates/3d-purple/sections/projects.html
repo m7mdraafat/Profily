@@ -1,0 +1,41 @@
+<!-- ===== PROJECTS SECTION ===== -->
+<section class="projects section" id="projects">
+    <div class="section-container">
+        <div class="section-header">
+            <span class="section-subtitle">{{ sections.projects.subtitle }}</span>
+            <h2 class="section-title">Featured <span class="gradient-text">Projects</span></h2>
+        </div>
+        <div class="projects-grid">
+            {{ for project in projects }}
+            <article class="project-card" data-animate>
+                <div class="project-image">
+                    <div class="project-image-placeholder {{ if (for.index % 2) == 1 }}purple-tint{{ end }}">
+                        <div class="placeholder-pattern">
+                            <div class="pattern-line"></div>
+                            <div class="pattern-line"></div>
+                            <div class="pattern-line"></div>
+                            <div class="pattern-circle"></div>
+                        </div>
+                        <span class="placeholder-num">{{ for.index | math.plus 1 | string.pad_left 2 '0' }}</span>
+                    </div>
+                    <div class="project-overlay">
+                        <a href="{{ project.url }}" target="_blank" rel="noopener noreferrer" class="project-overlay-btn" aria-label="View source code">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">{{ project.name }}</h3>
+                    <p class="project-desc">{{ project.description }}</p>
+                    <div class="project-tags">
+                        {{ if project.language }}<span>{{ project.language }}</span>{{ end }}
+                        {{ for topic in project.topics }}
+                        <span>{{ topic }}</span>
+                        {{ end }}
+                    </div>
+                </div>
+            </article>
+            {{ end }}
+        </div>
+    </div>
+</section>

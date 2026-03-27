@@ -1,0 +1,28 @@
+<!-- ===== EXPERIENCE SECTION ===== -->
+<section class="experience section" id="experience">
+    <div class="section-container">
+        <div class="section-header">
+            <span class="section-subtitle">{{ sections.experience.subtitle }}</span>
+            <h2 class="section-title">Work <span class="gradient-text">Experience</span></h2>
+        </div>
+        <div class="experience-timeline">
+            {{ for exp in experience }}
+            <div class="timeline-item glass-card" data-animate>
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <h3 class="timeline-title">{{ exp.title }}</h3>
+                        <span class="timeline-company">{{ exp.company }}</span>
+                    </div>
+                    <span class="timeline-date">
+                        {{ exp.start_date }}{{ if exp.is_current }} — Present{{ else if exp.end_date }} — {{ exp.end_date }}{{ end }}
+                    </span>
+                    {{ if exp.description }}
+                    <p class="timeline-desc">{{ exp.description }}</p>
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+        </div>
+    </div>
+</section>
