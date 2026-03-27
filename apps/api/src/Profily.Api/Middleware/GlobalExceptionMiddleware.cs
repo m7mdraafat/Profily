@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Profily.Core.Exceptions;
 
 namespace Profily.Api.Middleware;
@@ -55,7 +56,6 @@ public sealed class GlobalExceptionMiddleware
         }
 
         context.Response.StatusCode = statusCode;
-        context.Response.ContentType = "application/problem+json";
 
         var problem = new Dictionary<string, object?>
         {
@@ -71,6 +71,7 @@ public sealed class GlobalExceptionMiddleware
             problem["errors"] = validationEx.Errors;
         }
 
-        await context.Response.WriteAsJsonAsync(problem);
+        await context.Response.WriteAsJsonAsync(problem, new JsonSerializerOptions(),
+            contentType: "application/problem+json");
     }
 }
