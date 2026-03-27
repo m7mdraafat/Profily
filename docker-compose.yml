@@ -1,12 +1,12 @@
 services:
   db:
-    image: postgres:17:alpine
+    image: postgres:17-alpine
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER: profily
-      - POSTGRES_PASSWORD: profily_dev_123
-      - POSTGRES_DB: profily
+      POSTGRES_USER: profily
+      POSTGRES_PASSWORD: profily_dev_123
+      POSTGRES_DB: profily
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

@@ -83,7 +83,10 @@ build/
 .env
 .env.local
 .env.*.local
-!.env.example
+
+## App Settings (local dev override — template is committed)
+**/appsettings.json
+**/appsettings.Development.json
 
 ## Package manager
 npm-debug.log*
