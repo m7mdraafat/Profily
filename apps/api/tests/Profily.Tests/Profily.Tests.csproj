@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Profily.Core\Profily.Core.csproj" />
     <ProjectReference Include="..\..\src\Profily.Infrastructure\Profily.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Profily.Api\Profily.Api.csproj" />
   </ItemGroup>
 
 </Project>
