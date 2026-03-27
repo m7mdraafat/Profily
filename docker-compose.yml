@@ -1,29 +1,19 @@
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:17:alpine
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: profily
-      POSTGRES_PASSWORD: profily_dev_123
-      POSTGRES_DB: profily
+      - POSTGRES_USER: profily
+      - POSTGRES_PASSWORD: profily_dev_123
+      - POSTGRES_DB: profily
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U profily"]
-      interval: 5s
+      interval: 20s
       timeout: 5s
       retries: 5
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
+    
 volumes:
   pgdata:
