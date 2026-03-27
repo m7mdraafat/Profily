@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Profily.Api.Middleware;
@@ -117,5 +118,33 @@ public sealed class GlobalExceptionMiddlewareTests
         await middleware.InvokeAsync(context);
 
         Assert.True(nextCalled);
+    }
+
+    [Fact]
+    public async Task Exception_WhenResponseHasStarted_DoesNotWriteBodyAsync()
+    {
+        // Use a custom HttpContext where HasStarted returns true
+        var context = new DefaultHttpContext();
+        context.Features.Set<IHttpResponseFeature>(new StartedResponseFeature());
+        context.Response.Body = new MemoryStream();
+
+        var middleware = CreateMiddleware(_ => throw new InvalidOperationException("fail"));
+
+        // Should not throw even though response has started
+        await middleware.InvokeAsync(context);
+
+        // Body should be empty — middleware skipped writing
+        Assert.Equal(0, context.Response.Body.Length);
+    }
+
+    private sealed class StartedResponseFeature : IHttpResponseFeature
+    {
+        public int StatusCode { get; set; } = 200;
+        public string? ReasonPhrase { get; set; }
+        public IHeaderDictionary Headers { get; set; } = new HeaderDictionary();
+        public Stream Body { get; set; } = new MemoryStream();
+        public bool HasStarted => true; // Always report as started
+        public void OnCompleted(Func<object, Task> callback, object state) { }
+        public void OnStarting(Func<object, Task> callback, object state) { }
     }
 }
