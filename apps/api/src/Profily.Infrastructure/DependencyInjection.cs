@@ -33,6 +33,8 @@ public static class InfrastructureServiceRegistration
         // GitHub auth
         services.AddSingleton<IGitHubAuthService, GitHubAuthService>();
 
+        services.AddScoped<IGitHubApiService, GitHubApiService>();
+        services.AddScoped<IProjectSyncService, ProjectSyncService>();
         return services;
     }
 }
