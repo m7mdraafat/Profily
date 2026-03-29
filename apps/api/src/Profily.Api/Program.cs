@@ -31,5 +31,6 @@ app.UseMiddleware<SessionAuthMiddleware>();
 // Endpoints
 app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));
 app.MapAuthEndpoints();
+app.MapProjectEndpoints();
 
 app.Run();

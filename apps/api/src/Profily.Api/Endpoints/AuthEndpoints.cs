@@ -122,6 +122,21 @@ public static class AuthEndpoints
 
         await dbContext.SaveChangesAsync(context.RequestAborted);
 
+        var hasProjects = await dbContext.Projects.AnyAsync(p => p.UserId == user.Id, context.RequestAborted);
+
+        if (!hasProjects)
+        {
+            try
+            {
+                var syncService = context.RequestServices.GetRequiredService<IProjectSyncService>();
+                await syncService.SyncAsync(user.Id, accessToken, context.RequestAborted);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Auto-sync failed for {Username}, usre can sync manually", user.Username);
+            }
+        }
+        
         // Clean old sessions for this user, then create new
         await sessions.DeleteByUserAsync(user.Id, context.RequestAborted);
         var session = await sessions.CreateAsync(user.Id, context.RequestAborted);
