@@ -1,0 +1,504 @@
+{
+  "info": {
+    "name": "Profily API",
+    "description": "Portfolio builder API — GitHub OAuth, repo sync, CRUD for experience/education/social links.\n\n## Authentication\nAll endpoints except Auth (login/callback) and Health require a session cookie.\n\n1. Open `GET /api/auth/github` in browser\n2. Complete GitHub OAuth\n3. Copy the `session` cookie value from browser DevTools\n4. Set the `session_id` collection variable\n\n## Error Responses\nAll errors follow RFC 7807 Problem Details format.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "string",
+      "description": "Session UUID from browser cookie after GitHub OAuth login"
+    },
+    {
+      "key": "experience_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "education_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "social_link_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "project_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Lightweight liveness check. Returns 200 if the API is running. No authentication required."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "description": "GitHub OAuth login flow and session management.\n\nFlow:\n1. `GET /api/auth/github` → redirects to GitHub\n2. User authorizes → GitHub redirects to `/api/auth/callback`\n3. Callback creates user + session, sets `session` cookie\n4. All subsequent requests use the cookie automatically",
+      "item": [
+        {
+          "name": "Login with GitHub",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/github",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "github"]
+            },
+            "description": "Redirects to GitHub OAuth authorization page.\n\n**Open this in a browser** — Postman can't complete the OAuth flow.\n\nScopes requested: `read:user`, `user:email`, `repo`\n\nAfter authorization, GitHub redirects to `/api/auth/callback` which:\n- Creates or updates the user\n- Encrypts and stores the GitHub token\n- Creates a DB session\n- Sets an HttpOnly `session` cookie\n- Redirects to the frontend dashboard"
+          },
+          "response": []
+        },
+        {
+          "name": "OAuth Callback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/auth/callback?code=xxx&state=yyy",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "callback"],
+              "query": [
+                { "key": "code", "value": "xxx", "description": "Authorization code from GitHub" },
+                { "key": "state", "value": "yyy", "description": "CSRF state parameter (must match cookie)" }
+              ]
+            },
+            "description": "Called by GitHub after user authorizes. **Do not call manually** — this is part of the OAuth redirect flow.\n\nExchanges the code for a GitHub access token, upserts the user, creates a session, and redirects to the frontend."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Returns the authenticated user's profile.\n\n**Response:**\n```json\n{\n  \"id\": \"uuid\",\n  \"username\": \"m7mdraafat\",\n  \"displayName\": \"Mohamed Raafat\",\n  \"avatarUrl\": \"https://avatars.githubusercontent.com/...\",\n  \"bio\": \"...\",\n  \"location\": \"Egypt\",\n  \"company\": \"Microsoft\",\n  \"email\": \"user@example.com\",\n  \"gitHubUrl\": \"https://github.com/m7mdraafat\",\n  \"reposCount\": 27,\n  \"followersCount\": 71,\n  \"contributionsThisYear\": 0,\n  \"plan\": \"free\",\n  \"planExpiresAt\": null,\n  \"lastSyncedAt\": \"2026-03-27T...\",\n  \"createdAt\": \"2026-03-27T...\"\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Deletes the session from the database and clears the session cookie. Returns 200 OK."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "description": "GitHub repository management. Repos are synced from GitHub and stored locally. Users can enable up to 10 repos for their portfolio.",
+      "item": [
+        {
+          "name": "Sync Repos from GitHub",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/projects/sync",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects", "sync"]
+            },
+            "description": "Fetches all repos from GitHub API and upserts them into the database.\n\n- New repos are inserted\n- Existing repos are updated (stars, description, topics, etc.)\n- Repos deleted on GitHub are NOT removed (preserves custom descriptions)\n- Updates `user.reposCount` and `user.lastSyncedAt`\n\nAuto-triggered on first login. Manual re-sync via this endpoint.\n\n**Response:**\n```json\n{\n  \"newRepos\": 3,\n  \"updatedRepos\": 24,\n  \"totalRepos\": 27\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "List Projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/projects?page=1&pageSize=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects"],
+              "query": [
+                { "key": "page", "value": "1", "description": "Page number (default: 1)" },
+                { "key": "pageSize", "value": "20", "description": "Items per page (default: 20)" },
+                { "key": "enabled", "value": "true", "description": "Filter by enabled status (optional)", "disabled": true }
+              ]
+            },
+            "description": "Lists the user's GitHub repos with pagination.\n\nSorted by: enabled first → display order → stars descending.\n\n**Response:**\n```json\n{\n  \"data\": [\n    {\n      \"id\": \"uuid\",\n      \"name\": \"VideStore.API\",\n      \"description\": \"Full-stack e-commerce API\",\n      \"customDescription\": null,\n      \"language\": \"C#\",\n      \"topics\": [\"dotnet\", \"api\"],\n      \"stars\": 1,\n      \"forks\": 0,\n      \"isFork\": false,\n      \"htmlUrl\": \"https://github.com/...\",\n      \"homepageUrl\": null,\n      \"isEnabled\": true,\n      \"displayOrder\": 0,\n      \"lastPushedAt\": \"2026-03-20T...\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"pageSize\": 20,\n    \"totalCount\": 27,\n    \"totalPages\": 2\n  }\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isEnabled\": true,\n  \"displayOrder\": 0,\n  \"customDescription\": \"My custom project description\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects", "{{project_id}}"]
+            },
+            "description": "Toggle enable/disable, set display order, or add a custom description.\n\n**All fields are optional** (PATCH semantics). Only sent fields are updated.\n\n**Constraints:**\n- Maximum 10 projects can be enabled. Enabling an 11th returns `409 Conflict`.\n\n**Request body:**\n```json\n{\n  \"isEnabled\": true,         // optional\n  \"displayOrder\": 0,         // optional\n  \"customDescription\": \"...\" // optional\n}\n```"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User profile management. Personal info is editable; GitHub-synced fields (username, avatar) are updated on login.",
+      "item": [
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Mohamed Raafat\",\n  \"bio\": \"Backend engineer passionate about clean architecture\",\n  \"location\": \"Cairo, Egypt\",\n  \"company\": \"Microsoft\",\n  \"email\": \"m7mdraafat2003@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Update the current user's personal info.\n\n**All fields are optional** (PATCH semantics). Only sent fields are updated.\n\n**Validation:**\n- `displayName`: max 200 chars\n- `bio`: max 2000 chars\n- `location`: max 200 chars\n- `company`: max 200 chars\n- `email`: max 300 chars, must be valid email format\n\n**Returns:** Full user profile (same as GET /api/auth/me)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Experiences",
+      "description": "Work experience entries. Manual CRUD. Ordered by `displayOrder`.",
+      "item": [
+        {
+          "name": "List Experiences",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/experiences",
+              "host": ["{{base_url}}"],
+              "path": ["api", "experiences"]
+            },
+            "description": "Returns all experiences for the current user, ordered by `displayOrder`.\n\n**Response:**\n```json\n[\n  {\n    \"id\": \"uuid\",\n    \"title\": \"Software Engineer\",\n    \"company\": \"Microsoft\",\n    \"startDate\": \"2025-06-01\",\n    \"endDate\": null,\n    \"isCurrent\": true,\n    \"description\": \"Building scalable systems...\",\n    \"displayOrder\": 0\n  }\n]\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Experience",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('experience_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Software Engineer Intern\",\n  \"company\": \"Microsoft\",\n  \"startDate\": \"2025-06-01\",\n  \"endDate\": null,\n  \"isCurrent\": true,\n  \"description\": \"Building scalable backend systems with .NET and Azure.\",\n  \"displayOrder\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/experiences",
+              "host": ["{{base_url}}"],
+              "path": ["api", "experiences"]
+            },
+            "description": "Creates a new work experience entry.\n\n**Validation:**\n- `title`: required, max 200 chars\n- `company`: required, max 200 chars\n- `startDate`: required, must not be in the future\n- `endDate`: optional, must be after `startDate` if provided\n- `description`: optional, max 2000 chars\n\n**Returns:** 201 Created with the new experience.\n\n**Auto-saves** `experience_id` collection variable for use in update/delete."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Experience",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Software Engineer\",\n  \"isCurrent\": false,\n  \"endDate\": \"2026-03-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/experiences/{{experience_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "experiences", "{{experience_id}}"]
+            },
+            "description": "Partially update an experience. Only sent fields are changed.\n\n**Returns:** 200 OK with the updated experience.\n**404:** If the experience doesn't exist or belongs to another user."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Experience",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/experiences/{{experience_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "experiences", "{{experience_id}}"]
+            },
+            "description": "Deletes an experience entry.\n\n**Returns:** 204 No Content.\n**404:** If the experience doesn't exist or belongs to another user."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Educations",
+      "description": "Education entries. Manual CRUD. Ordered by `displayOrder`.",
+      "item": [
+        {
+          "name": "List Educations",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/educations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "educations"]
+            },
+            "description": "Returns all education entries for the current user, ordered by `displayOrder`.\n\n**Response:**\n```json\n[\n  {\n    \"id\": \"uuid\",\n    \"degree\": \"Bachelor of Computer Science\",\n    \"school\": \"Cairo University\",\n    \"startDate\": \"2021-09-01\",\n    \"endDate\": \"2025-06-01\",\n    \"description\": null,\n    \"displayOrder\": 0\n  }\n]\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Education",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('education_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"degree\": \"Bachelor of Computer Science\",\n  \"school\": \"Cairo University\",\n  \"startDate\": \"2021-09-01\",\n  \"endDate\": \"2025-06-01\",\n  \"description\": \"Focused on software engineering and distributed systems.\",\n  \"displayOrder\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/educations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "educations"]
+            },
+            "description": "Creates a new education entry.\n\n**Validation:**\n- `degree`: required, max 200 chars\n- `school`: required, max 200 chars\n- `startDate`: required\n- `endDate`: optional, must be after `startDate` if provided\n- `description`: optional, max 2000 chars\n\n**Returns:** 201 Created.\n**Auto-saves** `education_id` collection variable."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Education",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"degree\": \"BSc Computer Science\",\n  \"description\": \"Graduated with honors.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/educations/{{education_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "educations", "{{education_id}}"]
+            },
+            "description": "Partially update an education entry. Only sent fields are changed.\n\n**Returns:** 200 OK.\n**404:** If not found or belongs to another user."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Education",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/educations/{{education_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "educations", "{{education_id}}"]
+            },
+            "description": "Deletes an education entry.\n\n**Returns:** 204 No Content.\n**404:** If not found or belongs to another user."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Social Links",
+      "description": "Social media links. One link per platform per user (e.g., one LinkedIn, one Twitter).\n\nPlatform examples: `github`, `linkedin`, `twitter`, `leetcode`, `facebook`, `medium`, `kaggle`.\n\nGitHub link is auto-created on first sync.",
+      "item": [
+        {
+          "name": "List Social Links",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/social-links",
+              "host": ["{{base_url}}"],
+              "path": ["api", "social-links"]
+            },
+            "description": "Returns all social links for the current user, ordered by `displayOrder`.\n\n**Response:**\n```json\n[\n  {\n    \"id\": \"uuid\",\n    \"platform\": \"github\",\n    \"url\": \"https://github.com/m7mdraafat\",\n    \"iconFilename\": \"github.svg\",\n    \"displayOrder\": 0\n  },\n  {\n    \"id\": \"uuid\",\n    \"platform\": \"linkedin\",\n    \"url\": \"https://linkedin.com/in/m7mdraafat\",\n    \"iconFilename\": \"linkedin.svg\",\n    \"displayOrder\": 1\n  }\n]\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Social Link",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('social_link_id', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"platform\": \"linkedin\",\n  \"url\": \"https://linkedin.com/in/m7mdraafat\",\n  \"iconFilename\": \"linkedin.svg\",\n  \"displayOrder\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/social-links",
+              "host": ["{{base_url}}"],
+              "path": ["api", "social-links"]
+            },
+            "description": "Creates a new social link.\n\n**Validation:**\n- `platform`: required, max 50 chars\n- `url`: required, max 500 chars, must be a valid absolute URL\n- `iconFilename`: optional, max 100 chars\n\n**Constraints:**\n- One link per platform. Adding a second `linkedin` returns `409 Conflict`.\n\n**Returns:** 201 Created.\n**Auto-saves** `social_link_id` collection variable."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Social Link",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://linkedin.com/in/mohamedraafat\",\n  \"displayOrder\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/social-links/{{social_link_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "social-links", "{{social_link_id}}"]
+            },
+            "description": "Partially update a social link. Platform cannot be changed (delete and recreate instead).\n\n**Returns:** 200 OK.\n**404:** If not found or belongs to another user."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Social Link",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Cookie", "value": "session={{session_id}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/social-links/{{social_link_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "social-links", "{{social_link_id}}"]
+            },
+            "description": "Deletes a social link.\n\n**Returns:** 204 No Content.\n**404:** If not found or belongs to another user."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
