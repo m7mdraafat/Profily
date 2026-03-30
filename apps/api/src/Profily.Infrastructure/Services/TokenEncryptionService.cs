@@ -52,7 +52,9 @@ public sealed class TokenEncryptionService : ITokenEncryptionService
     {
         var minLength = AesGcm.NonceByteSizes.MaxSize + AesGcm.TagByteSizes.MaxSize;
         if (cipherText.Length < minLength)
+        {
             throw new ArgumentException($"Cipher text too short. Minimum {minLength} bytes required.", nameof(cipherText));
+        }
 
         var nonce = cipherText[..AesGcm.NonceByteSizes.MaxSize];
         var tag = cipherText[AesGcm.NonceByteSizes.MaxSize..(AesGcm.NonceByteSizes.MaxSize + AesGcm.TagByteSizes.MaxSize)];
