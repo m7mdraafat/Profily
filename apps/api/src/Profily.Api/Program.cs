@@ -1,3 +1,4 @@
+using FluentValidation;
 using Profily.Api.Endpoints;
 using Profily.Api.Middleware;
 using Profily.Infrastructure;
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Infrastructure (includes DbContext, settings, auth services)
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // CORS
 var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:5173";
@@ -32,5 +34,8 @@ app.UseMiddleware<SessionAuthMiddleware>();
 app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));
 app.MapAuthEndpoints();
 app.MapProjectEndpoints();
-
+app.MapUserEndpoints();
+app.MapExperienceEndpoints();
+app.MapEducationEndpoints();
+app.MapSocialLinkEndpoints();
 app.Run();
